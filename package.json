@@ -1,0 +1,28 @@
+{
+  "name": "pg-tsquery",
+  "version": "1.0.1",
+  "description": "Parse user input into PostgreSQL tsquery",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/caub/pg-tsquery.git"
+  },
+  "keywords": [
+    "pg",
+    "PostgreSQL",
+    "tsquery",
+    "parser"
+  ],
+  "author": "caub",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/caub/pg-tsquery/issues"
+  },
+  "homepage": "https://github.com/caub/pg-tsquery#readme",
+  "devDependencies": {
+    "pg": "^6.4.0"
+  }
+}
