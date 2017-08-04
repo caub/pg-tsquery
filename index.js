@@ -2,31 +2,34 @@
 
 parse any string to a valid pg tsquery
 
-special chars: ()<&!|:\s
-
-return a query with & and | (from ',') for the moment
-possibly ! soon, or parenthesis with a descent parser
-
 */
-
-const re = /[^\s,()<&!|:]+/g;
 
 module.exports = tsquery;
 
-function tsquery(_q='', wildcard='') {
-	const q = _q.trim(), a = [];
-	let m, s='', i=0;
-	while(m=re.exec(q)) {
-		const x = m[0];
-		a.push(m.index, m.index+x.length);
-	}
-	for (; i<a.length-2; i+=2) {
-		const start = a[i], end = a[i+1];
-		s += q.slice(start, end) + wildcard + (q[end+1]==','?'|':'&');
-	}
-	s += q.slice(a[i], a[i+1]);
-	return s && s + wildcard;
+// const TRIM_RE = /^[\s,()<&|:]+|[\s,()<&|:!]+$/g; // slower than below
+
+// use that when it's stable
+// const TRIM_START_RE = /^[\s,()<&|:]+/;
+// const TRIM_END_RE = /[\s,()<&|:!]+$/;
+// const OR_RE = /([\s()<&+:!]*[|,])+[\s()<&+:]*/g;
+// const AND_RE = /[\s()<&+:!]*[\s()<&+:]+/g;
+// const NOT_RE = /(^|[|&])-+(?=\w)/g;
+
+
+function tsquery(q='') {
+
+	const q1 = q.replace(/^[\s,()<&+|:]+/, '').replace(/[\s,()<&+|:!]+$/, '').replace(/\![\s,()<&|:]+/g, ''); // trim
+
+	const q2 = q1.replace(/([\s()<&+:!]*[|,])+[\s()<&+:]*/g, '|'); // process ORs
+
+	const q3 = q2.replace(/[\s()<&+:!]*[\s()<&+:]+/g, '&'); // process ANDs
+
+	if (q3=='|' || q3=='&') return '';
+
+	return q3.replace(/(^|[|&])-+(?=\w)/g, '$1!'); // let -word be like !word
 }
 
 
-// console.log(tsquery(' ,,,  ', ':*'))
+// console.log(tsquery(' ,,,  '))
+// console.log(tsquery(' I like totmatoes yum', ':*'));
+// console.log(tsquery('fast  ,, , fox quic')+':*');
