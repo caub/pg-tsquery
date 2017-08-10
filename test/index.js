@@ -18,7 +18,7 @@ hb &,pl`,
 	` foo& &&!bar - & | '""' & lol +,ok+ blue "" `,
 ];
 
-// console.log(tests.map(tsquery))
+// console.log(tests.map(tsquery));
 
 
 (async () => {
@@ -64,6 +64,7 @@ hb &,pl`,
 })()
 .then(() => {
 	console.log('ok');
+	process.exit();
 })
 .catch(e => {
 	console.error(e);
