@@ -14,7 +14,8 @@ Examples of inputs
 - `foo bar` is `foo&bar`
 - `foo -bar` is like `foo !bar`, `foo + !bar` and `foo&!bar`
 - `foo bar,bip` is like `foo+bar | bip` and `foo&bar|bip`
+- `foo (bar,bip)` is like `foo+(bar|bip)` and `foo&(bar|bip)`
 
 Notes:
-- `()<:` are ignored
-- it's safe to add `:*` at the end of the result of tsquery, if it's not empty, for substring matching 
+- `<:` are ignored
+- it's safe to add `:*` at the end of the result of tsquery, if it's **not empty** and **not ending with )**, for substring matching 

@@ -1,6 +1,6 @@
 {
   "name": "pg-tsquery",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "Parse user input into PostgreSQL tsquery",
   "main": "index.js",
   "scripts": {
@@ -23,6 +23,6 @@
   },
   "homepage": "https://github.com/caub/pg-tsquery#readme",
   "devDependencies": {
-    "pg": "^6.4.0"
+    "pg": "^6.4.2"
   }
 }

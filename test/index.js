@@ -16,6 +16,9 @@ hb &,pl`,
 	` foo,bar  ,\`  lol !,ok, !! -blue `,
 	` foo+---bar  ,  lol \`+ok+ blue `,
 	` foo& &&!bar - & | '""' & lol +,ok+ blue "" `,
+	`  (h(e((ll))o, (nas(ty)), (world\t\t`,
+	`  (h(e((ll))o, (nas(ty)), world\t\t`,
+	`  (h(e((ll))o (nas(ty)), )world\t\t`
 ];
 
 // console.log(tests.map(tsquery));
@@ -42,7 +45,7 @@ hb &,pl`,
 
 	for (const s of tests) {
 		const tq = tsquery(s);
-		if (!tq) continue;
+		if (!tq || tq.endsWith(')')) continue;
 		console.log('test', tq);
 		await pool.query(`select to_tsquery($1)`, [tq+':*']);
 	}
