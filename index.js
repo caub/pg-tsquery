@@ -26,7 +26,7 @@ function tsquery(q) {
 	// make sure parens are at the right place, and are balanced
 	const q5 = q4.replace(/[^&|!]([()])(?!([&|!()]|$))/g, function(a) { a.replace(/[()]/g, '')});
 	const re = /[()]/g;
-	let m, balance = 0;
+	var m, balance = 0;
 	while (m=re.exec(q5)) {
 		balance += m[0]==='(' ? 1 : -1;
 	}
