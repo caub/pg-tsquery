@@ -7,8 +7,10 @@ parse any string to a valid pg tsquery
 module.exports = tsquery;
 
 // todo: should do a proper parser at this point (better for parens)
-function tsquery(q='') {
+function tsquery(q) {
 
+	if(!q) {q = ''}
+	
 	// const q1 = q.replace(/^[\s,()<&+|:]+|\![\s,()<&|:]+|[\s,()<&+|:!]+$|/g, ''); // trim // slower than 2 non global like below
 	const q1 = q.replace(/^[\s,<&+|:]+/, '').replace(/[\s,<&+|:!]+$/, '').replace(/\![\s,<&|:]+/g, ''); // trim
 
