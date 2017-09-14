@@ -1,9 +1,10 @@
 
-const tsquery = require('../');
+const {tsquery, tsqueryOld} = require('../');
 const assert = require('assert');
 const {Pool} = require('pg');
 const pool = new Pool();
 
+// todo () is invalid
 
 const tests = [
 	`foo `,
@@ -39,14 +40,14 @@ hb &,pl`,
 
 	for (const s of tests) {
 		const tq = tsquery(s)
-		console.log('test', tq);
+		console.log('> ', tq);
+		// console.log('> ', tsqueryOld(s));
 		await pool.query(`select to_tsquery($1)`, [tq]);
 	}
 
 	for (const s of tests) {
 		const tq = tsquery(s);
 		if (!tq || tq.endsWith(')')) continue;
-		console.log('test', tq);
 		await pool.query(`select to_tsquery($1)`, [tq+':*']);
 	}
 
@@ -58,11 +59,17 @@ hb &,pl`,
 	}
 	console.timeEnd('- perf');
 
-	console.time('- perf comp');
+	console.time('- perf old');
+	for (const t of tests2) {
+		tsqueryOld(t);
+	}
+	console.timeEnd('- perf old');
+
+	console.time('- perf basic');
 	for (const t of tests2) {
 		t.match(/[^\s()<&!|:]+/g).join('&')
 	}
-	console.timeEnd('- perf comp');
+	console.timeEnd('- perf basic');
 
 })()
 .then(() => {
