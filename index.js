@@ -13,7 +13,7 @@ tsquery.tsqueryOld = tsqueryOld;
 
 /*
 OrAnd ::= OrAnd (/[\s|,&+]/ OrAnd)*  // precedence doesn't matter here, it's managed by pg's parser
-Word ::= /[!-]/ (/[^\s()<&!|:]+/ | '(' Or ')')
+Word ::= /[!-]/ (/[^\s()<&|:]+/ | '(' Or ')')
 */
 
 /*
@@ -52,7 +52,7 @@ function parse(s) {
 
 
 function parseWord(s) {
-	var m = s.match(/^[\s,<&+|:]*([!-])?[\s,<&+|:!-]*([^\s,<&+|:!-]*)/);
+	var m = s.match(/^[\s,<&+|:]*([!-])?[\s,<&+|:!-]*([^\s,<&+|:-]*)/);
 
 	var negated = m[1];
 	var value = m[2];
@@ -65,7 +65,7 @@ function parseWord(s) {
 		return {type: '(', negated, input: left.input.slice(mClose[0].length), left};
 	}
 
-	return {type: 'w', negated, input: s.slice(m[0].length), value: value.replace(/[()]/g, '')};
+	return {type: 'w', negated, input: s.slice(m[0].length), value: value.replace(/[()!]/g, '')};
 }
 
 function tsquery(q) {
@@ -126,5 +126,5 @@ function tsqueryOld(q) {
 // console.log(tsquery(' ,,,  '))
 // console.log(tsquery(' I like totmatoes yum'));
 // console.log(tsquery('(fa(st  ,, , fox) quic'));
-// console.log(tsquery(`"+!`));
-console.log(tsquery(`  (h(e((ll))o, (nas(ty)), (world\t\t `))
+// console.log(tsquery(`!he!llo`));
+// console.log(tsquery(`  (h(e((ll))o, (nas(ty)), (world\t\t `))
