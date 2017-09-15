@@ -28,7 +28,8 @@ Node: {
 }
 */
 
-const OR_AND__RE = /^\s*([|,])*([&+])*/;
+var OR_AND__RE = /^\s*([|,])*([&+])*/;
+var WORD__RE = /^[\s,<&+|:]*([!-])?[\s,<&+|:!-]*([^\s,<&+|:-]*)/;
 
 /*
  - s remaining string being parsed
@@ -52,7 +53,7 @@ function parse(s) {
 
 
 function parseWord(s) {
-	var m = s.match(/^[\s,<&+|:]*([!-])?[\s,<&+|:!-]*([^\s,<&+|:-]*)/);
+	var m = s.match(WORD__RE);
 
 	var negated = m[1];
 	var value = m[2];
@@ -65,7 +66,7 @@ function parseWord(s) {
 		return {type: '(', negated, input: left.input.slice(mClose[0].length), left};
 	}
 
-	return {type: 'w', negated, input: s.slice(m[0].length), value: value.replace(/[()!]/g, '')};
+	return {type: 'w', negated, input: s.slice(m[0].length), value: value.replace(/[()!]+/g, '')};
 }
 
 function tsquery(q) {
