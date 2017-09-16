@@ -1,10 +1,10 @@
 {
   "name": "pg-tsquery",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "description": "Parse user input into PostgreSQL tsquery",
   "main": "index.js",
   "scripts": {
-    "test": "node test"
+    "test": "uglifyjs index.js -c -m > /dev/null & node test"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/caub/pg-tsquery#readme",
   "devDependencies": {
-    "pg": "^6.4.2"
+    "pg": "^6.4.2",
+    "uglify-js": "^3.1.0"
   }
 }

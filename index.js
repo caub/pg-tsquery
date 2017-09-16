@@ -8,7 +8,6 @@ module.exports = tsquery;
 tsquery.tsquery = tsquery;
 tsquery.parse = parse;
 tsquery.toStr = toStr;
-tsquery.tsqueryOld = tsqueryOld;
 
 
 /*
@@ -45,7 +44,7 @@ function parse(s) {
 			next = parseWord(input.slice(m[0].length));
 		input = next.input;
 		m = input.match(OR_AND__RE);
-		node = {type, input, left: node, right: next};
+		node = {type: type, input: input, left: node, right: next};
 	}
 
 	return node;
@@ -63,10 +62,10 @@ function parseWord(s) {
 		
 		var mClose = left.input.match(/^[\s,<&+|:]*(\))?/);
 
-		return {type: '(', negated, input: left.input.slice(mClose[0].length), left};
+		return {type: '(', negated: negated, input: left.input.slice(mClose[0].length), left: left};
 	}
 
-	return {type: 'w', negated, input: s.slice(m[0].length), value: value.replace(/[()!]+/g, '')};
+	return {type: 'w', negated: negated, input: s.slice(m[0].length), value: value.replace(/[()!]+/g, '')};
 }
 
 function tsquery(q) {
@@ -93,36 +92,6 @@ function toStr(node) {
 	}
 	return s + leftStr + node.type + rightStr;
 }
-
-
-
-// old way, with regexes, kept for perf comparison
-function tsqueryOld(q) {
-	q = q || '';
-
-	var q1 = q.replace(/^[\s,<&+|:]+/, '').replace(/[\s,<&+|:!]+$/, '').replace(/\![\s,<&|:]+/g, ''); // trim
-
-	var q2 = q1.replace(/([\s<&+:!]*[|,])+[\s<&+:]*/g, '|'); // process ORs
-
-	var q3 = q2.replace(/[\s<&+:!]*[\s<&+:]+/g, '&'); // process ANDs
-
-	if (q3==='|' || q3==='&') return '';
-
-	var q4 = q3.replace(/(^|[|&])-+(?=\w)/g, '$1!'); // let -word be like !word
-
-	// the only operators are now & | !
-	// make sure parens are at the right place, and are balanced
-	var q5 = q4.replace(/[^&|!]([()])(?!([&|!()]|$))/g, function (a) {
-		return a.replace(/[()]/g, '');
-	});
-	var re = /[()]/g;
-	var m, balance = 0;
-	while (m=re.exec(q5)) {
-		balance += m[0]==='(' ? 1 : -1;
-	}
-	return balance < 0 ? q5.replace(/[()]/g, '') : q5 + ')'.repeat(balance);
-}
-
 
 // console.log(tsquery(' ,,,  '))
 // console.log(tsquery(' I like totmatoes yum'));

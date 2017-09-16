@@ -1,10 +1,9 @@
 
-const {tsquery, tsqueryOld} = require('../');
+const tsquery = require('../');
+const tsqueryOld = require('../index-old');
 const assert = require('assert');
 const {Pool} = require('pg');
 const pool = new Pool();
-
-// todo () is invalid
 
 const tests = [
 	`foo `,
