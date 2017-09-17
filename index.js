@@ -6,13 +6,15 @@ parse any string to a valid pg tsquery
 
 module.exports = tsquery;
 tsquery.tsquery = tsquery;
-tsquery.parse = parse;
+tsquery.parse = parseOr;
 tsquery.toStr = toStr;
 
 
 /*
-OrAnd ::= OrAnd (/[\s|,&+]/ OrAnd)*  // precedence doesn't matter here, it's managed by pg's parser
-Word ::= /[!-]/ (/[^\s()<&|:]+/ | '(' Or ')')
+Or ::= And (/\s*[|,]/ And)* 
+And ::= Factor (/\s*[&+]/ Factor)* 
+Factor ::= /[!-]?/ (Word | '(' Or ')')
+Word ::= /[^\s()<&|:]+/
 */
 
 /*
@@ -27,49 +29,63 @@ Node: {
 }
 */
 
-var OR_AND__RE = /^\s*([|,])*([&+])*/;
-var WORD__RE = /^[\s,<&+|:]*([!-])?[\s,<&+|:!-]*([^\s,<&+|:-]*)/;
+var OR__RE = /^\s*[|,]/;
+var AND__RE = /^\s*[&+]|^\s+(?=[^\s|,])/; // & or + or a space
+var WORD__RE = /^[\s|,&+<:]*([!-])?[\s|,&+<:!-]*([^\s|,&+<:]*)/;
 
 /*
  - s remaining string being parsed
 	returns Node
 */
-function parse(s) {
-	var node = parseWord(s),
+
+function parseOr(s) {
+	var node = parseAnd(s),
 		input = node.input,
-		m = input.match(OR_AND__RE);
+		m = input.match(OR__RE);
 
-	while (m[0]) {
-		var type = m[1] ? '|' : '&',
-			next = parseWord(input.slice(m[0].length));
+	while (m) {
+		var next = parseAnd(input.slice(m[0].length));
+
 		input = next.input;
-		m = input.match(OR_AND__RE);
-		node = {type: type, input: input, left: node, right: next};
+		m = input.match(OR__RE);
+		node = {type: '|', input: input, left: node, right: next};
 	}
-
 	return node;
 }
 
+function parseAnd(s) {
+	var left = parseWord(s),
+		input = left.input,
+		m = input.match(AND__RE);
+
+	if (!m) return left;
+
+	var right = parseOr(input.slice(m[0].length));
+	return {type: '&', input: right.input, left: left, right: right};
+}
 
 function parseWord(s) {
-	var m = s.match(WORD__RE);
+	var m = s.match(WORD__RE) || ['', undefined, ''];
 
 	var negated = m[1];
 	var value = m[2];
 
 	if (value[0] === '(') {
-		var left = parse(s.slice(m[0].length - value.length + 1)); // like value.slice(1) but capture all remaining string
+		var node = parseOr(s.slice(m[0].length - value.length + 1));
 		
-		var mClose = left.input.match(/^[\s,<&+|:]*(\))?/);
+		var mClose = node.input.match(/^[\s|,&+<:]*(\))?/);
 
-		return {type: '(', negated: negated, input: left.input.slice(mClose[0].length), left: left};
+		node.input = node.input.slice(mClose[0].length);
+		node.negated = negated;
+
+		return node;
 	}
 
 	return {type: 'w', negated: negated, input: s.slice(m[0].length), value: value.replace(/[()!]+/g, '')};
 }
 
 function tsquery(q) {
-	var node = parse(q || '');
+	var node = parseOr(q || '');
 	return toStr(node);
 }
 
@@ -79,9 +95,9 @@ function toStr(node) {
 	if (type === 'w') {
 		return node.value && (s + node.value); // avoid just '!'
 	}
-	if (type === '(') {
-		return s + '(' + toStr(node.left) + ')';
-	}
+	// if (type === '(') {
+	// 	return s + '(' + toStr(node.left) + ')';
+	// }
 	var leftStr = toStr(node.left);
 	var rightStr = toStr(node.right);
 	if (!leftStr) {
@@ -89,6 +105,12 @@ function toStr(node) {
 	}
 	if (!rightStr) {
 		return s + leftStr
+	}
+	if (node.type==='&' && node.left.type==='|') { // wrap left in parens
+		leftStr = '(' + leftStr + ')';
+	}
+	if (node.type==='&' && node.right.type==='|') { // wrap left in parens
+		rightStr = '(' + rightStr + ')';
 	}
 	return s + leftStr + node.type + rightStr;
 }

@@ -17,7 +17,7 @@ hb &,pl`,
 	` foo+---bar  ,  lol \`+ok+ blue `,
 	` foo& &&!bar - & | '""' & lol +,ok+ blue "" `,
 	`  (h(e((ll))o, (nas(ty)), (world\t\t`,
-	`  (h(e((ll))o, (nas(ty)), world\t\t`,
+	`  (h(e((ll))o, (nas(ty)) world\t\t`,
 	`  (h(e((ll))o (nas(ty)), )world\t\t`
 ];
 
@@ -40,7 +40,7 @@ hb &,pl`,
 	for (const s of tests) {
 		const tq = tsquery(s)
 		console.log('> ', tq);
-		// console.log('> ', tsqueryOld(s));
+		console.log('~ ', tsqueryOld(s));
 		await pool.query(`select to_tsquery($1)`, [tq]);
 	}
 
