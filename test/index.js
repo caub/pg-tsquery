@@ -7,6 +7,9 @@ const pool = new Pool();
 
 const tests = [
 	`foo `,
+	' hmm I like tomatoes ',
+	'(fa(st  ,, , fox) quic',
+	`!he!llo`,
 	`  o | 
 hb &,pl`,
 	` rgr   |, , ok,,ok+rg*rh*t&jnj&j&&jn\n\nrgr`,
@@ -21,8 +24,6 @@ hb &,pl`,
 	`  (h(e((ll))o (nas(ty)), )world\t\t`
 ];
 
-// console.log(tests.map(tsquery));
-
 
 (async () => {
 
@@ -36,11 +37,10 @@ hb &,pl`,
 
 	// todo add more tests of queries matching with it
 
-
 	for (const s of tests) {
 		const tq = tsquery(s)
 		console.log('> ', tq);
-		console.log('~ ', tsqueryOld(s));
+		console.log('  ', tsqueryOld(s));
 		await pool.query(`select to_tsquery($1)`, [tq]);
 	}
 

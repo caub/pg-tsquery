@@ -1,6 +1,6 @@
 /*
 
-parse any string to a valid pg tsquery
+parse any string to a valid pg tsquery (return string)
 
 */
 
@@ -22,7 +22,7 @@ Word ::= /[^\s()<&|:]+/
 Node: {
 	input: String // remaining input string to parse
 	value: String // matched value in input
-	type: Enum ('|', '&', 'w', '(')
+	type: Enum ('|', '&', 'w')
 	negated: Boolean (for words, whether they have a ! or - before)
 	left: Node
 	right: Node
@@ -95,9 +95,7 @@ function toStr(node) {
 	if (type === 'w') {
 		return node.value && (s + node.value); // avoid just '!'
 	}
-	// if (type === '(') {
-	// 	return s + '(' + toStr(node.left) + ')';
-	// }
+
 	var leftStr = toStr(node.left);
 	var rightStr = toStr(node.right);
 	if (!leftStr) {
@@ -114,9 +112,3 @@ function toStr(node) {
 	}
 	return s + leftStr + node.type + rightStr;
 }
-
-// console.log(tsquery(' ,,,  '))
-// console.log(tsquery(' I like totmatoes yum'));
-// console.log(tsquery('(fa(st  ,, , fox) quic'));
-// console.log(tsquery(`!he!llo`));
-// console.log(tsquery(`  (h(e((ll))o, (nas(ty)), (world\t\t `))

@@ -18,4 +18,4 @@ Examples of inputs
 
 Notes:
 - `<:` are ignored
-- it's safe to add `:*` at the end of the result of tsquery, if it's **not empty** and **not ending with )**, for substring matching 
+- it's safe to add `:*` at the end of the result of tsquery, if it's **not empty** and **not ending with )**, for substring matching (we could add an option to add it to the last word seen)
