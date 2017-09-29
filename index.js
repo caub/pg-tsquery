@@ -107,7 +107,7 @@ function toStr(node) {
 	if (node.type==='&' && node.left.type==='|') { // wrap left in parens
 		leftStr = '(' + leftStr + ')';
 	}
-	if (node.type==='&' && node.right.type==='|') { // wrap left in parens
+	if (node.type==='&' && node.right.type==='|') { // wrap right in parens
 		rightStr = '(' + rightStr + ')';
 	}
 	return s + leftStr + node.type + rightStr;
