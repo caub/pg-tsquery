@@ -1,4 +1,8 @@
-## pg text-search sanitizer [![Build Status](https://travis-ci.org/caub/pg-tsquery.svg?branch=master)](https://travis-ci.org/caub/pg-tsquery)
+## PostgreSQL text-search sanitizer
+
+[![npm version][npm-image]][npm-url]
+[![build status][travis-image]][travis-url]
+[![coverage status][codecov-image]][codecov-url]
 
 Like `plainto_tsquery` operator but allows more syntax (OR, NOT) without letting pg throws 
 
@@ -19,3 +23,11 @@ Examples of inputs
 Notes:
 - `<:` are ignored
 - it's safe to add `:*` at the end of the result of tsquery, if it's **not empty** and **not ending with )**, for substring matching (we could add an option to add it to the last word seen)
+
+
+[npm-image]: https://img.shields.io/npm/v/pg-tsquery.svg?style=flat-square
+[npm-url]: https://www.npmjs.com/package/pg-tsquery
+[travis-image]: https://img.shields.io/travis/caub/pg-tsquery.svg?style=flat-square
+[travis-url]: https://travis-ci.org/caub/pg-tsquery
+[codecov-image]: https://img.shields.io/codecov/c/github/caub/pg-tsquery.svg?style=flat-square
+[codecov-url]: https://codecov.io/gh/caub/pg-tsquery
