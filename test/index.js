@@ -1,4 +1,3 @@
-
 const tsquery = require('../');
 const tsqueryOld = require('../index-old');
 const assert = require('assert');
@@ -6,8 +5,15 @@ const {Pool} = require('pg');
 const pool = new Pool();
 
 const tests = [
-	`foo `,
+	'foo ',
 	' hmm I like tomatoes ',
+	'  o(x)o ',
+	'  o(x)-o ',
+	'  !o(x)o ',
+	'  o(-x)o ',
+	'-(foo (bar,sib)) ok',
+	'-(fast|fox) ok',
+	'(fast|fox) q',
 	'(fa(st  ,, , fox) quic',
 	`!he!llo`,
 	`  o | 
@@ -24,6 +30,10 @@ hb &,pl`,
 	`  (h(e((ll))o (nas(ty)), )world\t\t`
 ];
 
+// tests.forEach(s => {
+// 	console.log(tsquery(s))
+// });
+
 
 (async () => {
 
@@ -39,8 +49,8 @@ hb &,pl`,
 
 	for (const s of tests) {
 		const tq = tsquery(s)
-		console.log('> ', tq);
-		console.log('  ', tsqueryOld(s));
+		console.log('▪️ ', tq);
+		console.log('▫️ ', tsqueryOld(s));
 		await pool.query(`select to_tsquery($1)`, [tq]);
 	}
 
@@ -72,7 +82,7 @@ hb &,pl`,
 
 })()
 .then(() => {
-	console.log('ok');
+	console.log('✅ ok');
 	process.exit();
 })
 .catch(e => {
