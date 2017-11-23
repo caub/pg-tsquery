@@ -1,39 +1,38 @@
-const tsquery = require('../');
+const tsquery = require('..');
 const tsqueryOld = require('../index-old');
 const assert = require('assert');
 const {Pool} = require('pg');
 const pool = new Pool();
 
 const tests = [
-	'foo ',
-	' hmm I like tomatoes ',
-	'  o(x)o ',
-	'  o(x)-o ',
-	'  !o(x)o ',
-	'  o(-x)o ',
-	'-(foo (bar,sib)) ok',
-	'-(fast|fox) ok',
-	'(fast|fox) q',
-	'(fa(st  ,, , fox) quic',
-	`!he!llo`,
-	`  o | 
-hb &,pl`,
-	` rgr   |, , ok,,ok+rg*rh*t&jnj&j&&jn\n\nrgr`,
-	` ,,,,,, `,
-	` ,,,,+&&++ `,
-	` ,,,,+|+"+ &!& `,
-	` foo,bar  ,\`  lol !,ok, !! -blue `,
-	` foo+---bar  ,  lol \`+ok+ blue `,
-	` foo& &&!bar - & | '""' & lol +,ok+ blue "" `,
-	`  (h(e((ll))o, (nas(ty)), (world\t\t`,
-	`  (h(e((ll))o, (nas(ty)) world\t\t`,
-	`  (h(e((ll))o (nas(ty)), )world\t\t`
+	['foo ', 'foo'], 
+	[' hmm I like tomatoes ', 'hmm&I&like&tomatoes'],
+	['  o(x)o ', 'o&x&o'],
+	['  o(x)-o ', 'o&x&!o'],
+	['  !o(x)o ', '!o&x&o'],
+	['  o(-x)o ', 'o&!x&o'],
+	['-(foo (bar,sib)) ok', '!(foo&(bar|sib))&ok'],
+	['-(fast|fox) ok', '!(fast|fox)&ok'],
+	['(fast|fox) q', '(fast|fox)&q'],
+	['(fa(st  ,, , fox) quic', 'fa&(st|fox)&quic'],
+	[`!he!llo`, '!he&!llo'],
+	[`  o | 
+hb &,pl`, 'o|hb&pl'],
+	[` rgr   |, , ok,,ok+rg*rh*t&jnj&j&&jn\n\nrgr`, 'rgr|ok|ok&rg*rh*t&jnj&j&jn&rgr'],
+	[` ,,,,,, `, undefined],
+	[` ,,,,+&&++ `, undefined],
+	[` ,,,,+|+"+ &!& `, `"`],
+	[` foo,bar  ,\`  lol !,ok, !! -blue `, 'foo|bar|`&lol&ok|!blue'],
+	[` foo+---bar  ,  lol \`+ok+ blue `, 'foo&!bar|lol&`&ok&blue'],
+	[` foo& &&!bar - & | '""' & lol +,ok+ blue "" `, `foo&!bar&'""'&lol&ok&blue&""`],
+	[`  (h(e((ll))o, (nas(ty)), (world\t\t`, 'h&(e&ll&o|nas&ty|world)'],
+	[`  (h(e((ll))o, (nas(ty)) world\t\t`, 'h&(e&ll&o|nas&ty&world)'],
+	[`  (h(e((ll))o (nas(ty)), )world\t\t`, 'h&e&ll&o&nas&ty&world']
 ];
 
-// tests.forEach(s => {
-// 	console.log(tsquery(s))
-// });
-
+tests.forEach(([q, expected]) => {
+	assert.equal(tsquery(q), expected);
+});
 
 (async () => {
 
@@ -47,26 +46,21 @@ hb &,pl`,
 
 	// todo add more tests of queries matching with it
 
-	for (const s of tests) {
+	for (const [s] of tests) {
 		const tq = tsquery(s)
 		console.log('▪️ ', tq);
 		console.log('▫️ ', tsqueryOld(s));
 		await pool.query(`select to_tsquery($1)`, [tq]);
 	}
 
-	for (const s of tests) {
+	for (const [s] of tests) {
 		const tq = tsquery(s);
 		if (!tq || tq.endsWith(')')) continue;
 		await pool.query(`select to_tsquery($1)`, [tq+':*']);
 	}
 
 
-	const tests2 = [].concat(...Array.from({length:1e3}, (_,i)=> ['sea', 'car', 'bike', ...tests].map(x=>`${x} ${i||''}`)));
-	console.time('- perf');
-	for (const t of tests2) {
-		tsquery(t);
-	}
-	console.timeEnd('- perf');
+	const tests2 = [].concat(...Array.from({length:1e3}, (_,i)=> ['sea', 'car', 'bike', ...tests.map(a => a[0])].map(x=>`${x} ${i||''}`)));
 
 	console.time('- perf old');
 	for (const t of tests2) {
@@ -79,6 +73,12 @@ hb &,pl`,
 		t.match(/[^\s()<&!|:]+/g).join('&')
 	}
 	console.timeEnd('- perf basic');
+
+	console.time('- perf cur');
+	for (const t of tests2) {
+		tsquery(t);
+	}
+	console.timeEnd('- perf cur');
 
 })()
 .then(() => {

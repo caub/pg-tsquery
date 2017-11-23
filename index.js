@@ -27,7 +27,7 @@ function parse(str) {
 			return node;
 		}
 		node = {
-			type: /[|,]/.test(tail) ? '|' : '&',
+			type: /^[|,]/.test(tail) ? '|' : '&',
 			left: node,
 			right,
 			input: right.input
