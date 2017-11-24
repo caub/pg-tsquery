@@ -11,8 +11,7 @@ module.exports = tsquery
 tsquery.parse = parse;
 tsquery.toStr = toStr;
 
-if (!String.prototype.trimLeft) {
-	// good enough shim, for old node engines
+if (!String.prototype.trimLeft) { // good enough shim, for old node engines
 	String.prototype.trimLeft = String.prototype.trim;
 }
 

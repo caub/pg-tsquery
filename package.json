@@ -1,8 +1,11 @@
 {
   "name": "pg-tsquery",
-  "version": "6.0.1",
+  "version": "6.1.0",
   "description": "Parse user input into PostgreSQL tsquery",
   "main": "index.js",
+  "files": [
+    "index.js"
+  ],
   "scripts": {
     "test": "nyc node test",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"

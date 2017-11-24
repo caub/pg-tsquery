@@ -1,41 +1,16 @@
+const data = require('./data.json');
 const tsquery = require('..');
-const tsqueryOld = require('../index-old');
 const assert = require('assert');
 const {Pool} = require('pg');
 const pool = new Pool();
 
-const tests = [
-	['foo ', 'foo'], 
-	[' hmm I like tomatoes ', 'hmm&I&like&tomatoes'],
-	['  o(x)o ', 'o&x&o'],
-	['  o(x)-o ', 'o&x&!o'],
-	['  !o(x)o ', '!o&x&o'],
-	['  o(-x)o ', 'o&!x&o'],
-	['-(foo (bar,sib)) ok', '!(foo&(bar|sib))&ok'],
-	['-(fast|fox) ok', '!(fast|fox)&ok'],
-	['(fast|fox) q', '(fast|fox)&q'],
-	['(fa(st  ,, , fox) quic', 'fa&(st|fox)&quic'],
-	[`!he!llo`, '!he&!llo'],
-	[`  o | 
-hb &,pl`, 'o|hb&pl'],
-	[` rgr   |, , ok,,ok+rg*rh*t&jnj&j&&jn\n\nrgr`, 'rgr|ok|ok&rg*rh*t&jnj&j&jn&rgr'],
-	[` ,,,,,, `, undefined],
-	[` ,,,,+&&++ `, undefined],
-	[` ,,,,+|+"+ &!& `, `"`],
-	[` foo,bar  ,\`  lol !,ok, !! -blue `, 'foo|bar|`&lol&ok|!blue'],
-	[` foo+---bar  ,  lol \`+ok+ blue `, 'foo&!bar|lol&`&ok&blue'],
-	[` foo& &&!bar - & | '""' & lol +,ok+ blue "" `, `foo&!bar&'""'&lol&ok&blue&""`],
-	[`  (h(e((ll))o, (nas(ty)), (world\t\t`, 'h&(e&ll&o|nas&ty|world)'],
-	[`  (h(e((ll))o, (nas(ty)) world\t\t`, 'h&(e&ll&o|nas&ty&world)'],
-	[`  (h(e((ll))o (nas(ty)), )world\t\t`, 'h&e&ll&o&nas&ty&world']
-];
-
-tests.forEach(([q, expected]) => {
+data.forEach(([q, expected]) => {
 	assert.equal(tsquery(q), expected);
 });
 
 (async () => {
 
+	// test against pg's to_tsquery, it should not throw thanks to this module
 	await pool.query(`select to_tsquery($1)`, ['this crashes']).catch(e => assert(e));
 
 	await pool.query(`select to_tsvector('a quick brown fox') @@ plainto_tsquery($1) as x`, ['quick,fast fox'])
@@ -46,39 +21,32 @@ tests.forEach(([q, expected]) => {
 
 	// todo add more tests of queries matching with it
 
-	for (const [s] of tests) {
+	for (const [s] of data) {
 		const tq = tsquery(s)
-		console.log('▪️ ', tq);
-		console.log('▫️ ', tsqueryOld(s));
 		await pool.query(`select to_tsquery($1)`, [tq]);
 	}
 
-	for (const [s] of tests) {
+	for (const [s] of data) {
 		const tq = tsquery(s);
 		if (!tq || tq.endsWith(')')) continue;
-		await pool.query(`select to_tsquery($1)`, [tq+':*']);
+		await pool.query(`select to_tsquery($1)`, [tq + ':*']);
 	}
 
-
-	const tests2 = [].concat(...Array.from({length:1e3}, (_,i)=> ['sea', 'car', 'bike', ...tests.map(a => a[0])].map(x=>`${x} ${i||''}`)));
-
-	console.time('- perf old');
-	for (const t of tests2) {
-		tsqueryOld(t);
-	}
-	console.timeEnd('- perf old');
+	// quick perf test
+	const tests = [].concat(...Array.from({length:1e3}, (_,i)=> data.map(a=>`${a[0]} ${i||''}`)));
 
 	console.time('- perf basic');
-	for (const t of tests2) {
+	for (const t of tests) {
 		t.match(/[^\s()<&!|:]+/g).join('&')
 	}
 	console.timeEnd('- perf basic');
 
-	console.time('- perf cur');
-	for (const t of tests2) {
+	console.time('- perf current');
+	for (const t of tests) {
 		tsquery(t);
 	}
-	console.timeEnd('- perf cur');
+	console.timeEnd('- perf current');
+
 
 })()
 .then(() => {
@@ -89,4 +57,3 @@ tests.forEach(([q, expected]) => {
 	console.error(e);
 	process.exit(e);
 });
-
