@@ -33,11 +33,11 @@ data.forEach(([q, expected]) => {
 	}
 
 	// quick perf test
-	const tests = [].concat(...Array.from({length:1e3}, (_,i)=> data.map(a=>`${a[0]} ${i||''}`)));
+	const tests = [].concat(...Array.from({length:1e3}, (_,i) => data.map(a=>`${a[0]} ${i||''}`)));
 
 	console.time('- perf basic');
 	for (const t of tests) {
-		t.match(/[^\s()<&!|:]+/g).join('&')
+		t.match(/[^\s()<&!|:]+/g).join('&');
 	}
 	console.timeEnd('- perf basic');
 

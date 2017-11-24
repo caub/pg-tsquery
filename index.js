@@ -21,7 +21,6 @@ function parse(str) {
 	let tail = node && node.input && node.input.replace(/^[\s|,&+<:)\]]+/, '');
 	while (tail) {
 		const right = parseOr(tail);
-		// console.log('TAIL', tail, 'RIGHT', right)
 		if (!right) {
 			return node;
 		}
@@ -40,7 +39,6 @@ const OR = /^\s*[|,]/;
 
 function parseOr(str) {
 	let s = str;
-	// console.log('OR#mtch', m, str);
 	let node;
 
 	do {
@@ -51,7 +49,7 @@ function parseOr(str) {
 			const s2 = s.slice(m[0].length);
 			const m2 = s2.match(/^[\s|,&+<:!-]*/);
 			right = parseAnd(s2.slice(m2[0].length));
-			negated = /[!-]$/.test(m2[0]); // todo: no need for first part
+			negated = /[!-]$/.test(m2[0]);
 		} else {
 			right = parseAnd(s);
 		}
@@ -69,7 +67,6 @@ function parseOr(str) {
 		} : right;
 
 		s = node.input;
-		// console.log('OR', node);
 	}
 	while (node && node.input);
 
@@ -82,11 +79,8 @@ function parseAnd(str) {
 
 	let node = parseWord(str);
 
-	// console.log('AND#ini', str, node)
-
 	while (node && node.input) {
 		const m = node.input.match(AND);
-		// console.log('AND#match', m)
 
 		if (!m) {
 			return node;
@@ -107,7 +101,6 @@ function parseAnd(str) {
 			right,
 			input: right.input
 		};
-		// console.log('AND', node);
 	}
 	return node;
 }
@@ -117,16 +110,13 @@ function parseWord(str) {
 	const par = s.match(/^\s*[!-]*[(\[]/);
 	if (par) {
 		const s2 = s.slice(par[0].length);
-		// console.log('BEGIN PAR', s2)
 		const node = parseOr(s2);
-		// console.log('END PAR', node)
 		return {
 			...node,
 			negated: node.negated || par[0].length > 1,
 			input: node.input.trimLeft().replace(/^[)\]]/, '')
 		};
 	}
-	// console.log('WORD', s)
 	const m = s.match(/^\s*([!-]*)[^\s|,&+<:()\[\]!-]+/);
 
 	return m ? {
@@ -145,7 +135,6 @@ function toStr(node = {}) {
 
 	let leftStr = toStr(node.left);
 	let rightStr = toStr(node.right);
-	// console.log('STR', node, leftStr, rightStr);
 	if (!leftStr) {
 		return s + rightStr;
 	}
