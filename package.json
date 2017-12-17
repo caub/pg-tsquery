@@ -1,6 +1,6 @@
 {
   "name": "pg-tsquery",
-  "version": "6.1.1",
+  "version": "6.1.2",
   "description": "Parse user input into PostgreSQL tsquery",
   "main": "index.js",
   "files": [
@@ -28,6 +28,9 @@
     "url": "https://github.com/caub/pg-tsquery/issues"
   },
   "homepage": "https://github.com/caub/pg-tsquery#readme",
+  "engines": {
+    "node": ">=8.9"
+  },
   "devDependencies": {
     "codecov": "^3.0.0",
     "nyc": "^11.3.0",

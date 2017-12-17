@@ -41,11 +41,11 @@ data.forEach(([q, expected]) => {
 	}
 	console.timeEnd('- perf basic');
 
-	console.time('- perf current');
+	console.time('- perf tsquery');
 	for (const t of tests) {
 		tsquery(t);
 	}
-	console.timeEnd('- perf current');
+	console.timeEnd('- perf tsquery');
 
 
 })()
