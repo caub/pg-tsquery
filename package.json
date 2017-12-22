@@ -33,6 +33,9 @@
   },
   "devDependencies": {
     "codecov": "^3.0.0",
+    "eslint": "^4.13.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0",
     "nyc": "^11.3.0",
     "pg": "^7.4.0"
   }

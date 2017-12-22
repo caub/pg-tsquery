@@ -11,6 +11,7 @@ There's `plainto_tsquery` but it's very limited (it just puts an AND between wor
 
 This module allows to parse user input operators (AND `\s&+`, OR `,|`, NOT `!-` and parentheses `()[]`) without letting pg throws
 
+### Usage
 ```js
 const tsquery = require('pg-tsquery');
 
@@ -25,7 +26,7 @@ pool.query('SELECT * FROM tabby WHERE to_tsvector(col) @@ to_tsquery($1)', [tsqu
 | `foo (bar,bip)`, `foo+(bar\|bip)` | `foo&(bar\|bip)` |
 
 Notes:
-- `<:` are ignored, and act like word separators, so an AND
+- `<:` are ignored, and act like word separators, so like an AND
 - it's safe to add `:*` at the end of the result of tsquery (for substring matching), if it's **not empty** and **not ending with )** (we could add an option to add it to the last word seen)
 
 [npm-image]: https://img.shields.io/npm/v/pg-tsquery.svg?style=flat-square

@@ -1,13 +1,13 @@
 /**
  * parse any string to a valid pg tsquery
- * @param  {[string]} q
- * @return {[string]}
+ * @param  {string} q
+ * @returns {string}
  */
 function tsquery(q) {
 	return toStr(parse(q || ''));
 }
 
-module.exports = tsquery
+module.exports = tsquery;
 tsquery.parse = parse;
 tsquery.toStr = toStr;
 
@@ -35,7 +35,15 @@ function parse(str) {
 	return node;
 }
 
+const SEP = /^[\s|,&+<:!-]*/;
+
+// const FOLLOWED_BY = /^[</>](?:(\d+)[</>])?/;
+
 const OR = /^\s*[|,]/;
+
+const AND = /^(?!\s*[|,])[\s&+<:|,!-]*/;
+
+const WORD = /^\s*([!-]*)[^\s|,&+<:()[\]!-]+/;
 
 function parseOr(str) {
 	let s = str;
@@ -47,13 +55,13 @@ function parseOr(str) {
 		let negated;
 		if (m) {
 			const s2 = s.slice(m[0].length);
-			const m2 = s2.match(/^[\s|,&+<:!-]*/);
+			const m2 = s2.match(SEP);
 			right = parseAnd(s2.slice(m2[0].length));
 			negated = /[!-]$/.test(m2[0]);
 		} else {
 			right = parseAnd(s);
 		}
-		
+
 		if (!right) {
 			return node;
 		}
@@ -73,10 +81,7 @@ function parseOr(str) {
 	return node;
 }
 
-const AND = /^(?!\s*[|,])[\s&+<:|,!-]*/;
-
 function parseAnd(str) {
-
 	let node = parseWord(str);
 
 	while (node && node.input) {
@@ -85,8 +90,9 @@ function parseAnd(str) {
 		if (!m) {
 			return node;
 		}
+
 		const s = node.input.slice(m[0].length);
-		const m2 = s.match(/^[\s|,&+<:!-]*/);
+		const m2 = s.match(SEP);
 		const right = parseWord(s.slice(m2[0].length));
 
 		if (!right) {
@@ -107,7 +113,7 @@ function parseAnd(str) {
 
 function parseWord(str) {
 	const s = str.trimLeft();
-	const par = s.match(/^\s*[!-]*[(\[]/);
+	const par = s.match(/^\s*[!-]*[([]/);
 	if (par) {
 		const s2 = s.slice(par[0].length);
 		const node = parseOr(s2);
@@ -117,7 +123,7 @@ function parseWord(str) {
 			input: node.input.trimLeft().replace(/^[)\]]/, '')
 		};
 	}
-	const m = s.match(/^\s*([!-]*)[^\s|,&+<:()\[\]!-]+/);
+	const m = s.match(WORD);
 
 	return m ? {
 		value: m[0].slice(m[1].length),
@@ -141,10 +147,10 @@ function toStr(node = {}) {
 	if (!rightStr) {
 		return s + leftStr;
 	}
-	if (node.type==='&' && node.left.type==='|' && !node.left.negated) { // wrap left in parens
+	if (node.type === '&' && node.left.type === '|' && !node.left.negated) { // wrap left in parens
 		leftStr = '(' + leftStr + ')';
 	}
-	if (node.type==='&' && node.right.type==='|' && !node.right.negated) { // wrap right in parens
+	if (node.type === '&' && node.right.type === '|' && !node.right.negated) { // wrap right in parens
 		rightStr = '(' + rightStr + ')';
 	}
 	return s ? s + '(' + leftStr + node.type + rightStr + ')' : leftStr + node.type + rightStr;
