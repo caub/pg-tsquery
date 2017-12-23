@@ -43,7 +43,7 @@ const AND = /^(?!\s*[|,])[\s&+:|,!-]*/;
 
 const FOLLOWED_BY = /^\s*<(?:(?:(\d+)|-)?>)?/;
 
-const WORD = /^\s*([!-]*)[^\s|,&+<:()[\]!-]+/;
+const WORD = /^\s*([!-]*)([^\s|,&+<:*()[\]!-]+)/;
 
 function parseOr(str) {
 	let s = str;
@@ -155,11 +155,17 @@ function parseWord(str) {
 	}
 	const m = s.match(WORD);
 
-	return m ? {
-		value: m[0].slice(m[1].length),
+	if (m === null) {
+		return;
+	}
+	const next = s.slice(m[0].length);
+	const prefix = next.match(/^(\*|:\*)*/)[0];
+	return {
+		value: m[2],
 		negated: m[1],
-		input: s.slice(m.index + m[0].length)
-	} : undefined;
+		input: next.slice(prefix.length),
+		prefix
+	};
 }
 
 const PRECEDENCES = {
@@ -172,7 +178,7 @@ function toStr(node = {}) {
 	const s = node.negated ? '!' : '';
 	const type = node.type;
 	if (!type) {
-		return node.value && (s + node.value); // avoid just '!'
+		return node.value && (s + node.value + (node.prefix ? ':*' : '')); // avoid just '!'
 	}
 
 	let leftStr = toStr(node.left);

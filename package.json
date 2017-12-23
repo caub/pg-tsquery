@@ -1,6 +1,6 @@
 {
   "name": "pg-tsquery",
-  "version": "6.1.2",
+  "version": "6.2.0",
   "description": "Parse user input into PostgreSQL tsquery",
   "main": "index.js",
   "files": [

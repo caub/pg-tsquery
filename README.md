@@ -24,8 +24,8 @@ pool.query('SELECT * FROM tabby WHERE to_tsvector(col) @@ to_tsquery($1)', [tsqu
 | `foo -bar`, `foo !bar`, `foo + !bar` | `foo&!bar` |
 | `foo bar,bip`, `foo+bar \| bip` | `foo&bar\|bip` |
 | `foo (bar,bip)`, `foo+(bar\|bip)` | `foo&(bar\|bip)` |
-| `foo<bar<2>sun` | `foo<->bar<2>sun` |
-| `foo*,bar* bana:*` | `foo:*|bar:*&bana:*` |
+| `foo<bar<->bip<2>sun` | `foo<->bar<->bip<2>sun` |
+| `foo*,bar* bana:*` | `foo:*\|bar:*&bana:*` |
 
 [npm-image]: https://img.shields.io/npm/v/pg-tsquery.svg?style=flat-square
 [npm-url]: https://www.npmjs.com/package/pg-tsquery
