@@ -37,11 +37,11 @@ function parse(str) {
 
 const SEP = /^[\s|,&+<:!-]*/;
 
-// const FOLLOWED_BY = /^[</>](?:(\d+)[</>])?/;
-
 const OR = /^\s*[|,]/;
 
-const AND = /^(?!\s*[|,])[\s&+<:|,!-]*/;
+const AND = /^(?!\s*[|,])[\s&+:|,!-]*/;
+
+const FOLLOWED_BY = /^\s*<(?:(?:(\d+)|-)?>)?/;
 
 const WORD = /^\s*([!-]*)[^\s|,&+<:()[\]!-]+/;
 
@@ -82,10 +82,40 @@ function parseOr(str) {
 }
 
 function parseAnd(str) {
-	let node = parseWord(str);
+	let node = parseFollowBy(str);
 
 	while (node && node.input) {
 		const m = node.input.match(AND);
+
+		if (!m) {
+			return node;
+		}
+
+		const s = node.input.slice(m[0].length);
+		const m2 = s.match(SEP);
+		const right = parseFollowBy(s.slice(m2[0].length));
+
+		if (!right) {
+			return node;
+		}
+
+		right.negated = right.negated || /[!-]$/.test(m[0]) || /[!-]$/.test(m2[0]);
+
+		node = {
+			type: '&',
+			left: node,
+			right,
+			input: right.input
+		};
+	}
+	return node;
+}
+
+function parseFollowBy(str) {
+	let node = parseWord(str);
+
+	while (node && node.input) {
+		const m = node.input.match(FOLLOWED_BY);
 
 		if (!m) {
 			return node;
@@ -99,10 +129,10 @@ function parseAnd(str) {
 			return node;
 		}
 
-		right.negated = right.negated || /[!-]$/.test(m[0]) || /[!-]$/.test(m2[0]);
+		right.negated = right.negated || /[!-]$/.test(m2[0]);
 
 		node = {
-			type: '&',
+			type: m[1] ? `<${m[1]}>` : '<->',
 			left: node,
 			right,
 			input: right.input
@@ -132,6 +162,12 @@ function parseWord(str) {
 	} : undefined;
 }
 
+const PRECEDENCES = {
+	'|': 0,
+	'&': 1,
+	'<': 2
+};
+
 function toStr(node = {}) {
 	const s = node.negated ? '!' : '';
 	const type = node.type;
@@ -147,10 +183,10 @@ function toStr(node = {}) {
 	if (!rightStr) {
 		return s + leftStr;
 	}
-	if (node.type === '&' && node.left.type === '|' && !node.left.negated) { // wrap left in parens
+	if (node.left.type && PRECEDENCES[node.type[0]] > PRECEDENCES[node.left.type[0]] && !node.left.negated) { // wrap left in parens
 		leftStr = '(' + leftStr + ')';
 	}
-	if (node.type === '&' && node.right.type === '|' && !node.right.negated) { // wrap right in parens
+	if (node.right.type && PRECEDENCES[node.type[0]] > PRECEDENCES[node.right.type[0]] && !node.right.negated) { // wrap right in parens
 		rightStr = '(' + rightStr + ')';
 	}
 	return s ? s + '(' + leftStr + node.type + rightStr + ')' : leftStr + node.type + rightStr;
