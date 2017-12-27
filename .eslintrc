@@ -18,6 +18,7 @@
 		"arrow-parens": "off",
 		"no-use-before-define": "off",
 		"prefer-destructuring": "off",
+		"function-paren-newline": "off",
 		"no-extend-native": "warn",
 		"quotes": "warn",
 		"no-restricted-syntax": "warn",

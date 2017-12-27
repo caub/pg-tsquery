@@ -147,11 +147,10 @@ function parseWord(str) {
 	if (par) {
 		const s2 = s.slice(par[0].length);
 		const node = parseOr(s2);
-		return {
-			...node,
+		return Object.assign(node, {
 			negated: node.negated || par[0].length > 1,
 			input: node.input.trimLeft().replace(/^[)\]]/, '')
-		};
+		});
 	}
 	const m = s.match(WORD);
 
