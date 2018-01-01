@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>pg-tsquery</title>
+<style>
+html {
+	box-sizing: border-box;
+}
+*, *:before, *:after {
+	box-sizing: inherit;
+}
+body {
+	font-family: sans-serif;
+	font-size: 24px;
+	margin: 0;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	background: #eee;
+}
+h1 {
+	text-align: center;
+}
+h1 a {
+	text-decoration: none;
+	color: inherit;
+}
+main {
+	flex: 1;
+	display: flex;
+}
+main > * {
+	flex: 1;
+	padding: 6px;
+}
+textarea {
+	resize: none;
+	font-family: sans-serif;
+	font-size: 24px;
+	background: transparent;
+}
+</style>
+</head>
+<body>
+<header>
+	<h1><a href="https://github.com/caub/pg-tsquery">pg-tsquery</a></h1>
+</header>
+<main>
+	<textarea id="input" placeholder="Write your input">Write any* you want like (this, that, -zulu)</textarea>
+	<output id="output">bbh</output>
+</main>
+
+<script src="https://cdn.rawgit.com/caub/458cfe944f8abcf7b1aec608d0a878cc/raw/import.js"></script>
+
+<script>
+window.import('https://caub.github.io/pg-tsquery/').then(tsquery => {
+	function update() {
+		output.innerText = tsquery(input.value);
+	}
+	update();
+	input.oninput = update;
+});
+</script>
+
+</body>
+</html>
