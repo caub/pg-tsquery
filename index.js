@@ -37,9 +37,9 @@ function parse(str) {
 
 const SEP = /^[\s|,&+<:!-]*/;
 
-const OR = /^\s*[|,]/;
+const OR = /^\s*(?:[|,]|or)/;
 
-const AND = /^(?!\s*[|,])[\s&+:|,!-]*/;
+const AND = /^(?!\s*(?:[|,]|or))(?:[\s&+:|,!-]|and)*/;
 
 const FOLLOWED_BY = /^\s*<(?:(?:(\d+)|-)?>)?/;
 
