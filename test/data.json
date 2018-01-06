@@ -66,6 +66,10 @@
     "\""
   ],
   [
+    ":*,,, lol",
+    "lol"
+  ],
+  [
     " foo,bar  ,`  lol !,ok, !! -blue ",
     "foo|bar|`&lol&ok|!blue"
   ],
@@ -88,6 +92,14 @@
   [
     "  (h(e((ll))o (nas(ty)), )world\t\t",
     "h&e&ll&o&nas&ty&world"
+  ],
+  [
+    "follo* | by , nothin* <2>  \n ",
+    "follo:*|by|nothin:*&2>"
+  ],
+  [
+    " (lol (foo(bar (ok, ok",
+    "lol&foo&bar&(ok|ok)"
   ],
   [
     " Please, contribute <> to this proj* and repo* by add* mor* (ex*,example*)! Thanks",

@@ -11,7 +11,7 @@ module.exports = tsquery;
 tsquery.parse = parse;
 tsquery.toStr = toStr;
 
-if (!String.prototype.trimLeft) { // good enough shim, for old node engines
+if (!String.prototype.trimLeft) { /* istanbul ignore next */ // good enough shim, for old node engines
 	String.prototype.trimLeft = String.prototype.trim;
 }
 
@@ -43,7 +43,7 @@ const AND = /^(?!\s*(?:[|,]|or))(?:[\s&+:|,!-]|and)*/;
 
 const FOLLOWED_BY = /^\s*<(?:(?:(\d+)|-)?>)?/;
 
-const WORD = /^\s*([!-]*)([^\s|,&+<:*()[\]!-]+)/;
+const WORD = /^[\s*&+<:,|]*([!-]*)([^\s|,&+<:*()[\]!-]+)/;
 
 function parseOr(str) {
 	let s = str;
@@ -182,12 +182,12 @@ function toStr(node = {}) {
 
 	let leftStr = toStr(node.left);
 	let rightStr = toStr(node.right);
-	if (!leftStr) {
-		return s + rightStr;
-	}
-	if (!rightStr) {
-		return s + leftStr;
-	}
+	// if (!leftStr) {
+	// 	return s + rightStr;
+	// }
+	// if (!rightStr) {
+	// 	return s + leftStr;
+	// }
 	if (node.left.type && PRECEDENCES[node.type[0]] > PRECEDENCES[node.left.type[0]] && !node.left.negated) { // wrap left in parens
 		leftStr = '(' + leftStr + ')';
 	}
