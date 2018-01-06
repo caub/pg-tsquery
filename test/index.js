@@ -22,14 +22,8 @@ data.forEach(([q, expected]) => {
 	// todo add more tests of queries matching with it
 
 	for (const [s] of data) {
-		const tq = tsquery(s)
-		await pool.query(`select to_tsquery($1)`, [tq]);
-	}
-
-	for (const [s] of data) {
 		const tq = tsquery(s);
-		if (!tq || tq.endsWith(')')) continue;
-		await pool.query(`select to_tsquery($1)`, [tq + ':*']);
+		await pool.query(`select to_tsquery($1)`, [tq]);
 	}
 
 	// quick perf test
