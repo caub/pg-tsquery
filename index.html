@@ -47,19 +47,18 @@ textarea {
 </header>
 <main>
 	<textarea id="input" placeholder="Write your input">Write any* you want like (this, that or -zulu)</textarea>
-	<output id="output">bbh</output>
+	<output id="output">...</output>
 </main>
 
-<script src="https://cdn.rawgit.com/caub/458cfe944f8abcf7b1aec608d0a878cc/raw/import.js"></script>
+<script type="module">
+import tsquery from 'https://unpkg.com/pg-tsquery';
 
-<script>
-window.import('https://caub.github.io/pg-tsquery/').then(tsquery => {
-	function update() {
-		output.innerText = tsquery(input.value);
-	}
-	update();
-	input.oninput = update;
-});
+function update() {
+	output.innerText = tsquery(input.value);
+}
+update();
+input.oninput = update;
+
 </script>
 
 </body>

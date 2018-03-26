@@ -1,4 +1,4 @@
-# PostgreSQL text-search sanitizer
+# Text-Search parser for PostgreSQL
 
 [![npm version][npm-image]][npm-url]
 [![build status][travis-image]][travis-url]

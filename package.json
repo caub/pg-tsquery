@@ -1,13 +1,18 @@
 {
   "name": "pg-tsquery",
-  "version": "6.3.0",
-  "description": "Parse user input into PostgreSQL tsquery",
-  "main": "index.js",
+  "version": "6.4.0",
+  "description": "Parse user input into valid text search queries",
+  "main": "cjs/tsquery.js",
+  "browser": "umd/tsquery.js",
+  "module": "index.js",
   "files": [
-    "index.js"
+    "index.js",
+    "cjs",
+    "umd"
   ],
   "scripts": {
-    "test": "nyc node test",
+    "prepare": "rollup -c",
+    "test": "npm run prepare && nyc node test",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
   },
   "repository": {
@@ -32,11 +37,15 @@
     "node": ">=6.9"
   },
   "devDependencies": {
+    "@babel/core": "^7.0.0-beta.42",
+    "@babel/preset-env": "^7.0.0-beta.42",
     "codecov": "^3.0.0",
     "eslint": "^4.13.1",
-    "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.8.0",
     "nyc": "^11.3.0",
-    "pg": "^7.4.0"
-  }
+    "pg": "^7.4.0",
+    "rollup": "^0.57.1",
+    "rollup-plugin-babel": "^4.0.0-beta.2"
+  },
+  "dependencies": {}
 }
