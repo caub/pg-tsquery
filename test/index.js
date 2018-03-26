@@ -18,7 +18,9 @@ data.forEach(([q, expected]) => {
     .then(({ rows: [{ x }] }) => assert(!x));
 
   await pool
-    .query(`select to_tsvector('a quick brown fox') @@ to_tsquery($1) as x`, [tsquery('fast  ,, , fox quic') + ':*'])
+    .query(`select to_tsvector('a quick brown fox') @@ to_tsquery($1) as x`, [
+      tsquery('fast  ,, , fox quic') + ':*',
+    ])
     .then(({ rows: [{ x }] }) => assert(x));
 
   // todo add more tests of queries matching with it
