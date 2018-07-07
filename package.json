@@ -1,9 +1,9 @@
 {
   "name": "pg-tsquery",
-  "version": "6.4.2",
+  "version": "6.5.0",
   "description": "Parse user input into valid text search queries",
-  "main": "cjs/tsquery.js",
-  "browser": "umd/tsquery.js",
+  "main": "dist/tsquery.js",
+  "browser": "dist/tsquery.umd.js",
   "module": "index.js",
   "files": [
     "index.js",
@@ -12,7 +12,8 @@
   ],
   "scripts": {
     "prepare": "rollup -c",
-    "test": "npm run prepare && nyc node test",
+    "test": "nyc node test",
+    "pg": "docker run --rm -it -p 5432:5432 postgres",
     "coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
   },
   "repository": {
@@ -38,15 +39,16 @@
     "node": ">=6.9"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0-beta.47",
-    "@babel/preset-env": "^7.0.0-beta.47",
-    "codecov": "^3.0.2",
-    "eslint": "^4.13.1",
-    "eslint-plugin-import": "^2.12.0",
-    "nyc": "^11.8.0",
+    "@babel/core": "^7.0.0-beta.52",
+    "@babel/preset-env": "^7.0.0-beta.52",
+    "@std/esm": "^0.26.0",
+    "codecov": "^3.0.3",
+    "eslint": "^5.0.1",
+    "eslint-plugin-import": "^2.13.0",
+    "nyc": "^12.0.2",
     "pg": "^7.4.3",
-    "rollup": "^0.59.2",
-    "rollup-plugin-babel": "^4.0.0-beta.4"
+    "rollup": "^0.62.0",
+    "rollup-plugin-babel": "^4.0.0-beta.7"
   },
   "dependencies": {}
 }

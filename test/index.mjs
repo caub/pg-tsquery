@@ -1,9 +1,11 @@
-const data = require('./data.json');
-const tsquery = require('..');
-const assert = require('assert');
-const { Pool } = require('pg');
+import fs from 'fs';
+import assert from 'assert';
+import pg from 'pg';
+import tsquery from '../index';
 
-const pool = new Pool({ connectionString: 'pg:///postgres' });
+const data = JSON.parse(fs.readFileSync('./test/data.json') + '');
+
+const pool = new pg.Pool({ connectionString: 'pg://postgres@localhost:5432/postgres' });
 
 data.forEach(([q, expected]) => {
   assert.equal(tsquery(q), expected);

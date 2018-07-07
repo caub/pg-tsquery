@@ -7,8 +7,6 @@ export default function tsquery(q) {
   return toStr(parse(q || ''));
 }
 
-export { tsquery };
-
 if (!String.prototype.trimLeft) {
   /* istanbul ignore next */ // good enough shim, for old node engines
   String.prototype.trimLeft = String.prototype.trim;
@@ -68,11 +66,11 @@ function parseOr(str) {
 
     node = node
       ? {
-          type: '|',
-          left: node,
-          right,
-          input: right.input,
-        }
+        type: '|',
+        left: node,
+        right,
+        input: right.input,
+      }
       : right;
 
     s = node.input;
