@@ -1,9 +1,7 @@
-import fs from 'fs';
 import assert from 'assert';
 import pg from 'pg';
 import tsquery from '../index';
-
-const data = JSON.parse(fs.readFileSync('./test/data.json') + '');
+import data from './data.json';
 
 const pool = new pg.Pool({ connectionString: 'pg://postgres@localhost:5432/postgres' });
 
