@@ -1,15 +1,10 @@
 {
   "name": "pg-tsquery",
-  "version": "6.5.0",
+  "version": "6.6.0",
   "description": "Parse user input into valid text search queries",
   "main": "dist/tsquery.js",
   "browser": "dist/tsquery.umd.js",
   "module": "index.js",
-  "files": [
-    "index.js",
-    "cjs",
-    "umd"
-  ],
   "scripts": {
     "prepare": "rollup -c",
     "test": "nyc node test",
