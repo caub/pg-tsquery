@@ -46,7 +46,7 @@ data.forEach(([q, expected]) => {
   console.timeEnd('- perf tsquery');
 })()
   .then(() => {
-    console.log('✅ ok');
+    console.log('✔️ ok');
     process.exit();
   })
   .catch(e => {
