@@ -7,9 +7,9 @@ export default function tsquery(q) {
   return toStr(parse(q || ''));
 }
 
-if (!String.prototype.trimLeft) {
+if (!String.prototype.trimStart) {
   /* istanbul ignore next */ // good enough shim, for old node engines
-  String.prototype.trimLeft = String.prototype.trim;
+  String.prototype.trimStart = String.prototype.trim;
 }
 
 // consume unparsable tail string (when too many closing parens, ex: 'foo ) bar')
@@ -32,15 +32,9 @@ export function parse(str) {
   return node;
 }
 
-const SEP = /^[\s|,&+<:!-]*/;
+const SEP = /^[\s|,&+<:!-]*/; // what we define as punctuation
 
 const OR = /^\s*(?:[|,]|or)/i;
-
-const AND = /^(?!\s*(?:[|,]|or))(?:[\s&+:|,!-]|and)*/i;
-
-const FOLLOWED_BY = /^\s*<(?:(?:(\d+)|-)?>)?/;
-
-const WORD = /^[\s*&+<:,|]*([!-]*)([^\s|,&+<:*()[\]!-]+)/;
 
 function parseOr(str) {
   let s = str;
@@ -79,6 +73,8 @@ function parseOr(str) {
   return node;
 }
 
+const AND = /^(?!\s*(?:[|,]|or))(?:[\s&+:|,!-]|and)*/i;
+
 function parseAnd(str) {
   let node = parseFollowBy(str);
 
@@ -108,6 +104,8 @@ function parseAnd(str) {
   }
   return node;
 }
+
+const FOLLOWED_BY = /^\s*<(?:(?:(\d+)|-)?>)?/;
 
 function parseFollowBy(str) {
   let node = parseWord(str);
@@ -139,16 +137,19 @@ function parseFollowBy(str) {
   return node;
 }
 
+const WORD = /^[\s*&+<:,|]*([!-]*)([^\s|,&+<:*()[\]!-]+)/;
+
 function parseWord(str) {
-  const s = str.trimLeft();
+  const s = str.trimStart();
   const par = s.match(/^\s*[!-]*[([]/);
   if (par) {
     const s2 = s.slice(par[0].length);
     const node = parseOr(s2);
-    return Object.assign(node, {
-      negated: node.negated || par[0].length > 1,
-      input: node.input.trimLeft().replace(/^[)\]]/, ''),
-    });
+    if (node) {
+      node.negated = node.negated || par[0].length > 1;
+      node.input = node.input.trimStart().replace(/^[)\]]/, '');
+    }
+    return node;
   }
   const m = s.match(WORD);
 
