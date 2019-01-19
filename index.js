@@ -3,17 +3,12 @@
  * @param  {string} q
  * @returns {string}
  */
-export default function tsquery(q) {
+module.exports = function tsquery(q) {
   return toStr(parse(q || ''));
 }
 
-if (!String.prototype.trimStart) {
-  /* istanbul ignore next */ // good enough shim, for old node engines
-  String.prototype.trimStart = String.prototype.trim;
-}
-
 // consume unparsable tail string (when too many closing parens, ex: 'foo ) bar')
-export function parse(str) {
+function parse(str) {
   let node = parseOr(str);
   let tail = node && node.input && node.input.replace(/^[\s|,&+<:)\]]+/, '');
   while (tail) {
@@ -41,23 +36,11 @@ function parseOr(str) {
   let node;
 
   do {
-    const m = s.match(OR);
-    let right;
-    let negated;
-    if (m) {
-      const s2 = s.slice(m[0].length);
-      const m2 = s2.match(SEP);
-      right = parseAnd(s2.slice(m2[0].length));
-      negated = /[!-]$/.test(m2[0]);
-    } else {
-      right = parseAnd(s);
-    }
-
+    const s2 = s.replace(OR, '');
+    const right = parseAnd(s2);
     if (!right) {
       return node;
     }
-    right.negated = right.negated || negated;
-
     node = node
       ? {
         type: '|',
@@ -137,7 +120,7 @@ function parseFollowBy(str) {
   return node;
 }
 
-const WORD = /^[\s*&+<:,|]*([!-]*)([^\s|,&+<:*()[\]!-]+)/;
+const WORD = /^[\s*&+<:,|]*([\s!-]*)([^\s|,&+<:*()[\]!-]+)/;
 
 function parseWord(str) {
   const s = str.trimStart();
@@ -172,7 +155,7 @@ const PRECEDENCES = {
   '<': 2,
 };
 
-export function toStr(node = {}) {
+function toStr(node = {}) {
   const s = node.negated ? '!' : '';
   const type = node.type;
   if (!type) {

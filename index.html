@@ -50,15 +50,17 @@ textarea {
 	<output id="output">...</output>
 </main>
 
-<script type="module">
-import tsquery from 'https://unpkg.com/pg-tsquery/index.mjs';
-
-function update() {
-	output.innerText = tsquery(input.value);
-}
-update();
-input.oninput = update;
-
+<script>
+(async () => {
+	let text = await fetch('./index.js').then(r=>r.text());
+	text = text.replace('module.exports = ', 'export default ');
+	const {default: tsquery} = await import(URL.createObjectURL(new Blob([text], {type: 'application/javascript'})));
+	function update() {
+		output.innerText = tsquery(input.value);
+	}
+	update();
+	input.oninput = update;
+})();
 </script>
 
 </body>

@@ -1,7 +1,7 @@
-import assert from 'assert';
-import pg from 'pg';
-import tsquery from '../index';
-import data from './data.json';
+const assert = require('assert');
+const pg = require('pg');
+const tsquery = require('../index');
+const data = require('./data.json');
 
 const pool = new pg.Pool({ connectionString: 'pg://postgres@localhost:5432/postgres' });
 

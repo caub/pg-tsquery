@@ -33,7 +33,10 @@ pool.query('SELECT * FROM tabby WHERE to_tsvector(col) @@ to_tsquery($1)', [tsqu
 | `foo<bar<->bip<2>sun` | `foo<->bar<->bip<2>sun` |
 | `foo*,bar* bana:*` | `foo:*\|bar:*&bana:*` |
 
+
 ### [Demo](https://caub.github.io/pg-tsquery)
+
+Supports Nodejs>=9, for lower versions, you might need `if (!String.prototype.trimStart) String.prototype.trimStart = String.prototype.trim;`
 
 [npm-image]: https://img.shields.io/npm/v/pg-tsquery.svg?style=flat-square
 [npm-url]: https://www.npmjs.com/package/pg-tsquery
