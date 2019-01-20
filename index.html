@@ -54,7 +54,8 @@ textarea {
 (async () => {
 	let text = await fetch('./index.js').then(r=>r.text());
 	text = text.replace('module.exports = ', 'export default ');
-	const {default: tsquery} = await import(URL.createObjectURL(new Blob([text], {type: 'application/javascript'})));
+	const {default: Tsquery} = await import(URL.createObjectURL(new Blob([text], {type: 'application/javascript'})));
+	const tsquery = Tsquery();
 	function update() {
 		output.innerText = tsquery(input.value);
 	}

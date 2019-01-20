@@ -1,83 +1,71 @@
 /**
- * parse any string to a valid pg tsquery
- * @param  {string} q
- * @returns {string}
+ * Initializes tsquery parser
+ * @param  {object} 
+ * @returns {function} qString => parsedQString
  */
-module.exports = function tsquery(q) {
-  return toStr(parse(q || ''));
+module.exports = function tsquery({
+  OR = /^\s*(?:[|,]|or)/i, // regex for OR operator
+  AND = /^(?!\s*(?:[|,]|or))(?:[\s&+:|,!-]|and)*/i, // regex for AND operator
+  FOLLOWED_BY = /^\s*<(?:(?:(\d+)|-)?>)?/, // regex for FOLLOWED_BY operator
+  WORD = /^[\s*&+<:,|]*([\s!-]*)[\s*&+<:,|]*([^\s,|&+<:*()[\]!-]+)/, // regex for a WORD
+  PAR_START = /^\s*[!-]*[([]/, // regex for start of parenthesized group
+  PAR_END = /^[)\]]/, // regex for  end of parenthesized group
+  NEGATED = /[!-]$/, // regex to detect if the expression following an operator is negated, this is useful for example with 'foo!bar', you can parse it as foo&!bar by adding the negation as part of AND
+  PREFIX = /^(\*|:\*)*/, // regex for detecting prefix operator (placed at the end of a word to match words starting like it)
+  TAIL_OP = '&', // default operator to use with tail (unparsed suffix of the query, if any)
+} = {}) {
+  return q => toStr(parse(q || '', { OR, AND, FOLLOWED_BY, WORD, PAR_START, PAR_END, NEGATED, PREFIX, TAIL_OP }));
 }
 
-// consume unparsable tail string (when too many closing parens, ex: 'foo ) bar')
-function parse(str) {
-  let node = parseOr(str);
-  let tail = node && node.input && node.input.replace(/^[\s|,&+<:)\]]+/, '');
+function parse(str, opts) {
+  let node = parseOr(str, opts);
+  let tail = node && node.input;
   while (tail) {
-    const right = parseOr(tail);
-    if (!right) {
-      return node;
+    tail = tail.slice(1);
+    const right = parseOr(tail, opts);
+    if (right) {
+      node = {
+        type: opts.TAIL_OP,
+        left: node,
+        right,
+        input: right.input,
+      };
+      tail = node.input;
     }
-    node = {
-      type: /^[|,]/.test(tail) ? '|' : '&',
-      left: node,
-      right,
-      input: right.input,
-    };
-    tail = node.input;
   }
   return node;
 }
 
-const SEP = /^[\s|,&+<:!-]*/; // what we define as punctuation
+function parseOr(str, opts) {
+  let node = parseAnd(str, opts);
 
-const OR = /^\s*(?:[|,]|or)/i;
-
-function parseOr(str) {
-  let s = str;
-  let node;
-
-  do {
-    const s2 = s.replace(OR, '');
-    const right = parseAnd(s2);
-    if (!right) {
-      return node;
-    }
-    node = node
-      ? {
-        type: '|',
-        left: node,
-        right,
-        input: right.input,
-      }
-      : right;
-
-    s = node.input;
-  } while (node && node.input);
-
+  while (node && node.input) {
+    const m = node.input.match(opts.OR);
+    if (!m) return node;
+    const s = node.input.slice(m[0].length);
+    const right = parseAnd(s, opts);
+    if (!right) return node;
+    right.negated = right.negated || opts.NEGATED.test(m[0]);
+    node = {
+      type: '|',
+      left: node,
+      right,
+      input: right.input,
+    };
+  }
   return node;
 }
 
-const AND = /^(?!\s*(?:[|,]|or))(?:[\s&+:|,!-]|and)*/i;
-
-function parseAnd(str) {
-  let node = parseFollowBy(str);
+function parseAnd(str, opts) {
+  let node = parseFollowedBy(str, opts);
 
   while (node && node.input) {
-    const m = node.input.match(AND);
-
-    if (!m) {
-      return node;
-    }
-
+    const m = node.input.match(opts.AND);
+    if (!m) return node;
     const s = node.input.slice(m[0].length);
-    const m2 = s.match(SEP);
-    const right = parseFollowBy(s.slice(m2[0].length));
-
-    if (!right) {
-      return node;
-    }
-
-    right.negated = right.negated || /[!-]$/.test(m[0]) || /[!-]$/.test(m2[0]);
-
+    const right = parseFollowedBy(s, opts);
+    if (!right) return node;
+    right.negated = right.negated || opts.NEGATED.test(m[0]);
     node = {
       type: '&',
       left: node,
@@ -88,28 +76,16 @@ function parseAnd(str) {
   return node;
 }
 
-const FOLLOWED_BY = /^\s*<(?:(?:(\d+)|-)?>)?/;
-
-function parseFollowBy(str) {
-  let node = parseWord(str);
+function parseFollowedBy(str, opts) {
+  let node = parseWord(str, opts);
 
   while (node && node.input) {
-    const m = node.input.match(FOLLOWED_BY);
-
-    if (!m) {
-      return node;
-    }
-
+    const m = node.input.match(opts.FOLLOWED_BY);
+    if (!m) return node;
     const s = node.input.slice(m[0].length);
-    const m2 = s.match(SEP);
-    const right = parseWord(s.slice(m2[0].length));
-
-    if (!right) {
-      return node;
-    }
-
-    right.negated = right.negated || /[!-]$/.test(m2[0]);
-
+    const right = parseWord(s, opts);
+    if (!right) return node;
+    right.negated = right.negated || opts.NEGATED.test(m[0]);
     node = {
       type: m[1] ? `<${m[1]}>` : '<->',
       left: node,
@@ -120,27 +96,25 @@ function parseFollowBy(str) {
   return node;
 }
 
-const WORD = /^[\s*&+<:,|]*([\s!-]*)([^\s|,&+<:*()[\]!-]+)/;
-
-function parseWord(str) {
+function parseWord(str, opts) {
   const s = str.trimStart();
-  const par = s.match(/^\s*[!-]*[([]/);
+  const par = s.match(opts.PAR_START);
   if (par) {
     const s2 = s.slice(par[0].length);
-    const node = parseOr(s2);
+    const node = parseOr(s2, opts);
     if (node) {
       node.negated = node.negated || par[0].length > 1;
-      node.input = node.input.trimStart().replace(/^[)\]]/, '');
+      node.input = node.input.trimStart().replace(opts.PAR_END, '');
     }
     return node;
   }
-  const m = s.match(WORD);
+  const m = s.match(opts.WORD);
 
   if (m === null) {
     return;
   }
   const next = s.slice(m[0].length);
-  const prefix = next.match(/^(\*|:\*)*/)[0];
+  const prefix = next.match(opts.PREFIX)[0];
   return {
     value: m[2],
     negated: m[1],
@@ -173,5 +147,6 @@ function toStr(node = {}) {
     // wrap right in parens
     rightStr = '(' + rightStr + ')';
   }
-  return s ? s + '(' + leftStr + node.type + rightStr + ')' : leftStr + node.type + rightStr;
+  const content = leftStr + node.type + rightStr;
+  return s ? s + '(' + content + ')' : content;
 }

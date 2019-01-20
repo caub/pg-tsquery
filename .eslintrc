@@ -1,8 +1,6 @@
 {
 	"extends": [
-		"eslint:recommended",
-		"plugin:import/errors",
-		"plugin:import/warnings"
+		"eslint:recommended"
 	],
 	"env": {
 		"browser": true,
@@ -10,18 +8,10 @@
 		"es6": true
 	},
 	"parserOptions": {
-		"ecmaVersion": 2018,
-		"sourceType": "module",
-		"ecmaFeatures": {
-			"jsx": true
-		}
+		"ecmaVersion": 2018
 	},
 	"rules": {
 		"no-console": "warn",
-		"max-len": [
-			"warn",
-			180,
-			4
-		]
+		"max-len": ["warn", 180, 4]
 	}
 }

@@ -1,6 +1,6 @@
 const assert = require('assert');
 const pg = require('pg');
-const tsquery = require('../index');
+const tsquery = require('../index')();
 const data = require('./data.json');
 
 const pool = new pg.Pool({ connectionString: 'pg://postgres@localhost:5432/postgres' });
@@ -46,7 +46,7 @@ data.forEach(([q, expected]) => {
   console.timeEnd('- perf tsquery');
 })()
   .then(() => {
-    console.log('✔️ ok');
+    console.log('✔️  ok');
     process.exit();
   })
   .catch(e => {
