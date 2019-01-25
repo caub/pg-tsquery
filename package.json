@@ -1,6 +1,6 @@
 {
   "name": "pg-tsquery",
-  "version": "7.0.0-2",
+  "version": "7.0.0",
   "description": "Parse user input into valid text search queries",
   "scripts": {
     "test": "eslint . && nyc node test",

@@ -1,110 +1,110 @@
 [
-    [
-        "foo ",
-        "foo"
-    ],
-    [
-        "blue sea,sun",
-        "blue&sea|sun"
-    ],
-    [
-        " hmm I like tomatoes ",
-        "hmm&I&like&tomatoes"
-    ],
-    [
-        "  o(x)o ",
-        "o&x&o"
-    ],
-    [
-        "  o(x)-o ",
-        "o&x&-o"
-    ],
-    [
-        "  !o(x)o ",
-        "!o&x&o"
-    ],
-    [
-        "  o(-x)o ",
-        "o&-x&o"
-    ],
-    [
-        "-(foo (bar,sib)) ok",
-        "-&foo&(bar|sib)&ok"
-    ],
-    [
-        "-(fast|fox) ok",
-        "-&(fast|fox)&ok"
-    ],
-    [
-        "(fast|fox) q",
-        "(fast|fox)&q"
-    ],
-    [
-        "(fa(st  ,, , fox) quic",
-        "fa&(st|fox)&quic"
-    ],
-    [
-        "!he!llo",
-        "!he&!llo"
-    ],
-    [
-        "  o | \nhb &,pl",
-        "o|hb&pl"
-    ],
-    [
-        " rgr   |, , ok,,ok+rg*rh*t&jnj&j&&jn\n\nrgr",
-        "rgr|ok|ok+rg:*&rh:*&t&jnj&j&jn&rgr"
-    ],
-    [
-        " ,,,,,, ",
-        null
-    ],
-    [
-        " ,,,,+&&++ ",
-        "+&++"
-    ],
-    [
-        " ,,,,+|+\"+ &!& ",
-        "+|+\"+"
-    ],
-    [
-        ":*,,, lol",
-        "lol"
-    ],
-    [
-        " foo,bar  ,`  lol !,ok, !! -blue ",
-        "foo|bar|`&lol&ok|!-blue"
-    ],
-    [
-        " foo+---bar  ,  lol `+ok+ blue ",
-        "foo+---bar|lol&`+ok+&blue"
-    ],
-    [
-        " foo& &&!bar - & | '\"\"' & lol +,ok+ blue \"\" ",
-        "foo&!bar&-&'\"\"'&lol&+|ok+&blue&\"\""
-    ],
-    [
-        "  (h(e((ll))o, (nas(ty)), (world\t\t",
-        "h&(e&ll&o|nas&ty|world)"
-    ],
-    [
-        "  (h(e((ll))o, (nas(ty)) world\t\t",
-        "h&(e&ll&o|nas&ty&world)"
-    ],
-    [
-        "  (h(e((ll))o (nas(ty)), )world\t\t",
-        "h&e&ll&o&nas&ty&world"
-    ],
-    [
-        "follo* | by , nothin* <2>  \n ",
-        "follo:*|by|nothin:*&2>"
-    ],
-    [
-        " (lol (foo(bar (ok, ok",
-        "lol&foo&bar&(ok|ok)"
-    ],
-    [
-        " Please, contribute <> to this proj* and repo* by add* mor* (ex*,example*)! Thanks",
-        "Please|contribute<->to&this&proj:*&and&repo:*&by&add:*&mor:*&(ex:*|example:*)&Thanks"
-    ]
+  [
+    "foo ",
+    "foo"
+  ],
+  [
+    "blue sea,sun",
+    "blue&sea|sun"
+  ],
+  [
+    " hmm I like tomatoes ",
+    "hmm&I&like&tomatoes"
+  ],
+  [
+    "  o(x)o ",
+    "o&x&o"
+  ],
+  [
+    "  o(x)-o ",
+    "o&x&-o"
+  ],
+  [
+    "  !o(x)o ",
+    "!o&x&o"
+  ],
+  [
+    "  o(-x)o ",
+    "o&-x&o"
+  ],
+  [
+    "-(foo (bar,sib)) ok",
+    "-&foo&(bar|sib)&ok"
+  ],
+  [
+    "-(fast|fox) ok",
+    "-&(fast|fox)&ok"
+  ],
+  [
+    "(fast|fox) q",
+    "(fast|fox)&q"
+  ],
+  [
+    "(fa(st  ,, , fox) quic",
+    "fa&(st|fox)&quic"
+  ],
+  [
+    "!he!llo",
+    "!he&!llo"
+  ],
+  [
+    "  o | \nhb &,pl",
+    "o|hb&pl"
+  ],
+  [
+    " rgr   |, , ok,,ok+rg*rh*t&jnj&j&&jn\n\nrgr",
+    "rgr|ok|ok+rg:*&rh:*&t&jnj&j&jn&rgr"
+  ],
+  [
+    " ,,,,,, ",
+    null
+  ],
+  [
+    " ,,,,+&&++ ",
+    "+&++"
+  ],
+  [
+    " ,,,,+|+\"+ &!& ",
+    "+|+\"+"
+  ],
+  [
+    ":*,,, lol",
+    "lol"
+  ],
+  [
+    " foo,bar  ,`  lol !,ok, !! -blue ",
+    "foo|bar|`&lol&ok|!-blue"
+  ],
+  [
+    " foo+---bar  ,  lol `+ok+ blue ",
+    "foo+---bar|lol&`+ok+&blue"
+  ],
+  [
+    " foo& &&!bar - & | '\"\"' & lol +,ok+ blue \"\" ",
+    "foo&!bar&-&'\"\"'&lol&+|ok+&blue&\"\""
+  ],
+  [
+    "  (h(e((ll))o, (nas(ty)), (world\t\t",
+    "h&(e&ll&o|nas&ty|world)"
+  ],
+  [
+    "  (h(e((ll))o, (nas(ty)) world\t\t",
+    "h&(e&ll&o|nas&ty&world)"
+  ],
+  [
+    "  (h(e((ll))o (nas(ty)), )world\t\t",
+    "h&e&ll&o&nas&ty&world"
+  ],
+  [
+    "follo* | by , nothin* <2>  \n ",
+    "follo:*|by|nothin:*&2>"
+  ],
+  [
+    " (lol (foo(bar (ok, ok",
+    "lol&foo&bar&(ok|ok)"
+  ],
+  [
+    " Please, contribute <> to this proj* and repo* by add* mor* (ex*,example*)! Thanks",
+    "Please|contribute<->to&this&proj:*&and&repo:*&by&add:*&mor:*&(ex:*|example:*)&Thanks"
+  ]
 ]

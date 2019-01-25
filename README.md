@@ -14,12 +14,12 @@ This module allows to parse various user input operators:
 - [`FOLLOWED_BY`](index.js#L9): defaults to `<>` `<->` `<\d+>`
 - [`OR`](index.js#L7): defaults to `,` `|` `or`
 - [`NOT`](index.js#L13): defaults to `!` `-`
-- [`PREFIX`](index.js#L14): defaults to `:*`
+- [`PREFIX`](index.js#L14): defaults to `*` `:*`
 - [`PARENTHESES`](index.js#L11-L12): defaults to `()[]`
 
 ### Usage
 ```js
-const tsquery = require('pg-tsquery');
+const tsquery = require('pg-tsquery')(/* options can be passed, see test/index.js for an example */);
 
 pool.query('SELECT * FROM tabby WHERE to_tsvector(col) @@ to_tsquery($1)', [tsquery(str)])
 ```
