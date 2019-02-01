@@ -3,6 +3,7 @@ const Tsquery = require('../index')
 const pg = require('pg');
 const data = require('./data-default.json');
 const data2 = require('./data-simple.json');
+const data3 = require('./data-phrase.json');
 
 const pool = new pg.Pool({ connectionString: 'pg://postgres@localhost:5432/postgres' });
 
@@ -18,9 +19,21 @@ const tsquery2 = Tsquery({
   PREFIX: /^(\*|:\*)*/,
   TAIL_OP: '&',
 });
+const tsquery3 = Tsquery({
+  OR: /^\s*[|,]/,
+  AND: /^\s*&+/,
+  FOLLOWED_BY: /^\s*(?:\s+|<(?:(?:(\d+)|-)?>)?)/,
+  WORD: /^[\s*&<:,|]*([\s!]*)[\s*&<:,|]*([^\s,|&<:*()!]+)/,
+  PAR_START: /^\s*!*[(]/,
+  PAR_END: /^[)]/,
+  NEGATED: /!$/,
+  PREFIX: /^(\*|:\*)*/,
+  TAIL_OP: '&',
+});
 
 test('default', tsquery, data);
 test('simple', tsquery2, data2);
+test('phrase', tsquery3, data3);
 
 async function test(name, tsquery, data) {
   try {
@@ -39,7 +52,9 @@ async function test(name, tsquery, data) {
       .query(`select to_tsvector('a quick brown fox') @@ to_tsquery($1) as x`, [
         tsquery('fast  ,, , fox quic') + ':*',
       ])
-      .then(({ rows: [{ x }] }) => assert(x));
+      .then(({ rows: [{ x }] }) => {
+        assert(name === 'phrase' ? !x : x); // with phrase it's fast<->fox<->quic
+      });
 
     // todo add more tests of queries matching with it
 

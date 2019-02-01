@@ -4,7 +4,7 @@
   "description": "Parse user input into valid text search queries",
   "scripts": {
     "test": "eslint . && nyc node test",
-    "pg": "docker run --rm -it -p 5432:5432 postgres"
+    "pg": "docker run --rm -it -p 5432:5432 postgres:11"
   },
   "repository": "github:caub/pg-tsquery",
   "keywords": [

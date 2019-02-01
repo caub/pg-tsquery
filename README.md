@@ -9,6 +9,8 @@
 Using pg's `to_tsquery` with user input can throw  
 There's `plainto_tsquery` but it's very limited (it just puts an AND between words)
 
+**note**: this is going to be reworked to handle quotes, similarly to the new `websearch_to_tsquery` 
+
 This module allows to parse various user input operators:
 - [`AND`](index.js#L8): defaults to `&` `+` `and` `\s+`
 - [`FOLLOWED_BY`](index.js#L9): defaults to `<>` `<->` `<\d+>`
