@@ -1,31 +1,49 @@
 /**
+ * @typedef {Object} TsqueryOptions
+ * @prop {RegExp} word - regex for a word. It must contain named captures: word (required), quote (optional), phrase (optional), negated (optional)
+ * @prop {RegExp} negated - regex to detect if the expression following an operator is negated, this is useful for example with 'foo!bar', you can parse it as foo&!bar by adding the negation as part of and
+ * @prop {RegExp} quotedWordSep - regex for word delimiters inside quotes
+ * @prop {RegExp?} or - regex for or operator
+ * @prop {RegExp?} and - regex for and operator
+ * @prop {RegExp?} followedBy - regex for followedBy operator
+ * @prop {RegExp?} parStart - regex for start of parenthesized group
+ * @prop {RegExp?} parEnd - regex for  end of parenthesized group
+ * @prop {RegExp?} prefix - regex for detecting prefix operator (placed at the end of a word to match words starting like it)
+ * @prop {String?} tailOp - default operator to use with tail (unparsed suffix of the query, if any)
+ */
+
+/** @type {TsqueryOptions} */
+const defaultOpts = {
+  or: /^\s*(?:[|,]|or)/i,
+  and: /^(?!\s*(?:[|,]|or))(?:[\s&+:|,!-]|and)*/i, // /^\s*(?:[\s&+:|,!-]|and)*/i,
+  followedBy: /^\s*>/, // /^\s*<(?:(?:(\d+)|-)?>)?/,
+  word: /^[\s*&+<:,|]*(?<negated>[\s!-]*)[\s*&+<:,|]*(?:(?<quote>["'])(?<phrase>.*?)\k<quote>|(?<word>[^\s,|&+<:*()[\]!-]+))/,
+  quotedWordSep: /(?:[\s<()|&!]|:\*)+/, // those are mostly tsquery operator, not removing them would cause errors
+  parStart: /^\s*[!-]*[([]/,
+  parEnd: /^[)\]]/,
+  negated: /[!-]$/,
+  prefix: /^(\*|:\*)*/,
+  tailOp: '&',
+};
+
+/**
  * Initializes tsquery parser
- * @param  {object} 
+ * @param  {TsqueryOptions} opts
  * @returns {function} qString => parsedQString
  */
-module.exports = function tsquery({
-  OR = /^\s*(?:[|,]|or)/i, // regex for OR operator
-  AND = /^(?!\s*(?:[|,]|or))(?:[\s&+:|,!-]|and)*/i, // regex for AND operator
-  FOLLOWED_BY = /^\s*<(?:(?:(\d+)|-)?>)?/, // regex for FOLLOWED_BY operator
-  WORD = /^[\s*&+<:,|]*([\s!-]*)[\s*&+<:,|]*([^\s,|&+<:*()[\]!-]+)/, // regex for a WORD
-  PAR_START = /^\s*[!-]*[([]/, // regex for start of parenthesized group
-  PAR_END = /^[)\]]/, // regex for  end of parenthesized group
-  NEGATED = /[!-]$/, // regex to detect if the expression following an operator is negated, this is useful for example with 'foo!bar', you can parse it as foo&!bar by adding the negation as part of AND
-  PREFIX = /^(\*|:\*)*/, // regex for detecting prefix operator (placed at the end of a word to match words starting like it)
-  TAIL_OP = '&', // default operator to use with tail (unparsed suffix of the query, if any)
-} = {}) {
-  return q => toStr(parse(q || '', { OR, AND, FOLLOWED_BY, WORD, PAR_START, PAR_END, NEGATED, PREFIX, TAIL_OP }));
+module.exports = function tsquery(opts) {
+  return q => toStr(parse(q || '', { ...defaultOpts, ...opts }));
 }
 
 function parse(str, opts) {
   let node = parseOr(str, opts);
   let tail = node && node.input;
-  while (tail) {
+  while (tail && opts.tailOp) {
     tail = tail.slice(1);
     const right = parseOr(tail, opts);
     if (right) {
       node = {
-        type: opts.TAIL_OP,
+        type: opts.tailOp,
         left: node,
         right,
         input: right.input,
@@ -39,13 +57,13 @@ function parse(str, opts) {
 function parseOr(str, opts) {
   let node = parseAnd(str, opts);
 
-  while (node && node.input) {
-    const m = node.input.match(opts.OR);
+  while (node && node.input && opts.or) {
+    const m = node.input.match(opts.or);
     if (!m) return node;
     const s = node.input.slice(m[0].length);
     const right = parseAnd(s, opts);
     if (!right) return node;
-    right.negated = right.negated || opts.NEGATED.test(m[0]);
+    right.negated = right.negated || opts.negated.test(m[0]);
     node = {
       type: '|',
       left: node,
@@ -59,13 +77,13 @@ function parseOr(str, opts) {
 function parseAnd(str, opts) {
   let node = parseFollowedBy(str, opts);
 
-  while (node && node.input) {
-    const m = node.input.match(opts.AND);
+  while (node && node.input && opts.and) {
+    const m = node.input.match(opts.and);
     if (!m) return node;
     const s = node.input.slice(m[0].length);
     const right = parseFollowedBy(s, opts);
     if (!right) return node;
-    right.negated = right.negated || opts.NEGATED.test(m[0]);
+    right.negated = right.negated || opts.negated.test(m[0]);
     node = {
       type: '&',
       left: node,
@@ -79,13 +97,13 @@ function parseAnd(str, opts) {
 function parseFollowedBy(str, opts) {
   let node = parseWord(str, opts);
 
-  while (node && node.input) {
-    const m = node.input.match(opts.FOLLOWED_BY);
+  while (node && node.input && opts.followedBy) {
+    const m = node.input.match(opts.followedBy);
     if (!m) return node;
     const s = node.input.slice(m[0].length);
     const right = parseWord(s, opts);
     if (!right) return node;
-    right.negated = right.negated || opts.NEGATED.test(m[0]);
+    right.negated = right.negated || opts.negated.test(m[0]);
     node = {
       type: m[1] ? `<${m[1]}>` : '<->',
       left: node,
@@ -98,27 +116,30 @@ function parseFollowedBy(str, opts) {
 
 function parseWord(str, opts) {
   const s = str.trimStart();
-  const par = s.match(opts.PAR_START);
+  const par = s.match(opts.parStart);
   if (par) {
     const s2 = s.slice(par[0].length);
     const node = parseOr(s2, opts);
     if (node) {
       node.negated = node.negated || par[0].length > 1;
-      node.input = node.input.trimStart().replace(opts.PAR_END, '');
+      node.input = node.input.trimStart().replace(opts.parEnd, '');
     }
     return node;
   }
-  const m = s.match(opts.WORD);
+  const m = s.match(opts.word);
 
-  if (m === null) {
+  if (m === null || !m.groups) {
     return;
   }
   const next = s.slice(m[0].length);
-  const prefix = next.match(opts.PREFIX)[0];
+  const prefix = opts.prefix ? next.match(opts.prefix)[0] : '';
+  const input = next.slice(prefix.length);
+  const value = m.groups.word || `"${m.groups.phrase.split(opts.quotedWordSep).join('<->')}"`; // it looks nasty, but to_tsquery will handle this well, see tests
+  const negated = !!m.groups.negated;
   return {
-    value: m[2],
-    negated: m[1],
-    input: next.slice(prefix.length),
+    value,
+    negated,
+    input,
     prefix,
   };
 }

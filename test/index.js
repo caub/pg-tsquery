@@ -2,45 +2,31 @@ const assert = require('assert');
 const Tsquery = require('../index')
 const pg = require('pg');
 const data = require('./data-default.json');
-const data2 = require('./data-simple.json');
-const data3 = require('./data-phrase.json');
+const dataSimple = require('./data-simple.json');
 
 const pool = new pg.Pool({ connectionString: 'pg://postgres@localhost:5432/postgres' });
 
 const tsquery = Tsquery(); // use default config
-const tsquery2 = Tsquery({
-  OR: /^\s*[|,]/,
-  AND: /^(?!\s*[|,])[\s&:|,!]*/,
-  FOLLOWED_BY: /^\s*<(?:(?:(\d+)|-)?>)?/,
-  WORD: /^[\s*&<:,|]*([\s!]*)[\s*&<:,|]*([^\s,|&<:*()!]+)/,
-  PAR_START: /^\s*!*[(]/,
-  PAR_END: /^[)]/,
-  NEGATED: /!$/,
-  PREFIX: /^(\*|:\*)*/,
-  TAIL_OP: '&',
-});
-const tsquery3 = Tsquery({
-  OR: /^\s*[|,]/,
-  AND: /^\s*&+/,
-  FOLLOWED_BY: /^\s*(?:\s+|<(?:(?:(\d+)|-)?>)?)/,
-  WORD: /^[\s*&<:,|]*([\s!]*)[\s*&<:,|]*([^\s,|&<:*()!]+)/,
-  PAR_START: /^\s*!*[(]/,
-  PAR_END: /^[)]/,
-  NEGATED: /!$/,
-  PREFIX: /^(\*|:\*)*/,
-  TAIL_OP: '&',
+const tsquerySimple = Tsquery({
+  or: /^\s*[|,]/,
+  and: /^(?!\s*[|,])[\s&:|,!]*/,
+  followedBy: /^\s*>/,
+  word: /^[\s*&<:,|]*(?<negated>[\s!]*)[\s*&<:,|]*(?<word>[^\s,|&<:*()!]+)/,
+  parStart: /^\s*!*[(]/,
+  parEnd: /^[)]/,
+  negated: /!$/,
+  prefix: /^(\*|:\*)*/,
+  tailOp: '&',
 });
 
 test('default', tsquery, data);
-test('simple', tsquery2, data2);
-test('phrase', tsquery3, data3);
+test('simple', tsquerySimple, dataSimple);
 
 async function test(name, tsquery, data) {
   try {
     for (const [q, expected] of data) {
-      assert.equal(tsquery(q), expected);
+      assert.equal(tsquery(q), expected, `for: ${q}`);
     }
-
     // test against pg's to_tsquery, it should not throw thanks to this module
     await pool.query(`select to_tsquery($1)`, ['this crashes']).catch(e => assert(e));
 

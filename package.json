@@ -1,9 +1,9 @@
 {
   "name": "pg-tsquery",
-  "version": "7.0.0",
+  "version": "8.0.0",
   "description": "Parse user input into valid text search queries",
   "scripts": {
-    "test": "eslint . && nyc node test",
+    "test": "eslint . && tsc --target es2018 --noEmit --alwaysStrict --allowJs --checkJs index.js && nyc node test",
     "pg": "docker run --rm -it -p 5432:5432 postgres:11"
   },
   "repository": "github:caub/pg-tsquery",
@@ -23,9 +23,11 @@
   },
   "homepage": "https://github.com/caub/pg-tsquery#readme",
   "devDependencies": {
+    "@types/node": "^10.12.24",
     "codecov": "^3.1.0",
     "eslint": "^5.12.1",
     "nyc": "^13.1.0",
-    "pg": "^7.8.0"
+    "pg": "^7.8.0",
+    "typescript": "^3.3.3"
   }
 }

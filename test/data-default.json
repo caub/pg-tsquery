@@ -79,7 +79,7 @@
   ],
   [
     " foo& &&!bar - & | '\"\"' & lol +,ok+ blue \"\" ",
-    "foo&!bar&'\"\"'&lol&ok&blue&\"\""
+    "foo&!bar&\"\"\"\"&lol&ok&blue&\"\""
   ],
   [
     "  (h(e((ll))o, (nas(ty)), (world\t\t",
@@ -102,7 +102,11 @@
     "lol&foo&bar&(ok|ok)"
   ],
   [
-    " Please, contribute <> to this proj* and repo* by add* mor* (ex*,example*)! Thanks",
+    "Test \"quoted text G1-ABC +37544:*\" ",
+    "Test&\"quoted<->text<->G1-ABC<->+37544<->\""
+  ],
+  [
+    " Please, contribute > to this proj* and repo* by add* mor* (ex*,example*)! Thanks",
     "Please|contribute<->to&this&proj:*&repo:*&by&add:*&mor:*&(ex:*|example:*)&Thanks"
   ]
 ]
