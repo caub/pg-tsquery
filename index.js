@@ -1,15 +1,5 @@
 /**
- * @typedef {Object} TsqueryOptions
- * @prop {RegExp} word - regex for a word. It must contain named captures: word (required), quote (optional), phrase (optional), negated (optional)
- * @prop {RegExp} negated - regex to detect if the expression following an operator is negated, this is useful for example with 'foo!bar', you can parse it as foo&!bar by adding the negation as part of and
- * @prop {RegExp} quotedWordSep - regex for word delimiters inside quotes
- * @prop {RegExp?} or - regex for or operator
- * @prop {RegExp?} and - regex for and operator
- * @prop {RegExp?} followedBy - regex for followedBy operator
- * @prop {RegExp?} parStart - regex for start of parenthesized group
- * @prop {RegExp?} parEnd - regex for  end of parenthesized group
- * @prop {RegExp?} prefix - regex for detecting prefix operator (placed at the end of a word to match words starting like it)
- * @prop {String?} tailOp - default operator to use with tail (unparsed suffix of the query, if any)
+ * @typedef { import("./index").TsqueryOptions } TsqueryOptions
  */
 
 /** @type {TsqueryOptions} */
