@@ -6,22 +6,15 @@
 
 ### Why?
 
-Using pg's `to_tsquery` with user input can throw  
-There's `plainto_tsquery` but it's very limited (it just puts an and between words)
+Using pg's `to_tsquery` directly with user input can throw errors. `plainto_tsquery` sanitizes the user input, but it's very limited (it just puts an and between words), similarly `websearch_to_tsquery` does this, except between quotes.
 
-**note**: this is going to be reworked to handle quotes, similarly to the new `websearch_to_tsquery` 
+This module allows customizable text-search operators (and, or, followedBy, not, prefix, parentheses, quoted text), while also preserving quoted text just like `websearch_to_tsquery`.
 
-This module allows to parse various user input operators:
-- [`and`](index.js#L8): defaults to `&` `+` `and` `\s+`
-- [`followedBy`](index.js#L9): defaults to `<>` `<->` `<\d+>`
-- [`or`](index.js#L7): defaults to `,` `|` `or`
-- [`NOT`](index.js#L13): defaults to `!` `-`
-- [`prefix`](index.js#L14): defaults to `*` `:*`
-- [`PARENTHESES`](index.js#L11-L12): defaults to `()[]`
+See the [full options](index.js#L2-L12) and [defaults](index.js#L16-L27)
 
 ### Usage
 ```js
-const tsquery = require('pg-tsquery')(/* options can be passed, see test/index.js for an example */);
+const tsquery = require('pg-tsquery')(/* options can be passed to override the defaults */);
 
 pool.query('SELECT * FROM tabby WHERE to_tsvector(col) @@ to_tsquery($1)', [tsquery(str)])
 ```
@@ -32,7 +25,7 @@ pool.query('SELECT * FROM tabby WHERE to_tsvector(col) @@ to_tsquery($1)', [tsqu
 | `foo -bar`, `foo !bar`, `foo + !bar` | `foo&!bar` |
 | `foo bar,bip`, `foo+bar \| bip` | `foo&bar\|bip` |
 | `foo (bar,bip)`, `foo+(bar\|bip)` | `foo&(bar\|bip)` |
-| `foo<bar<->bip<2>sun` | `foo<->bar<->bip<2>sun` |
+| `foo>bar>bip` | `foo<->bar<->bip` |
 | `foo*,bar* bana:*` | `foo:*\|bar:*&bana:*` |
 
 

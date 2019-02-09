@@ -1,6 +1,6 @@
 {
   "name": "pg-tsquery",
-  "version": "8.0.0",
+  "version": "8.0.1",
   "description": "Parse user input into valid text search queries",
   "scripts": {
     "test": "eslint . && tsc --target es2018 --noEmit --alwaysStrict --allowJs --checkJs index.js && nyc node test",

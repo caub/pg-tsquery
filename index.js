@@ -17,7 +17,7 @@ const defaultOpts = {
   or: /^\s*(?:[|,]|or)/i,
   and: /^(?!\s*(?:[|,]|or))(?:[\s&+:|,!-]|and)*/i, // /^\s*(?:[\s&+:|,!-]|and)*/i,
   followedBy: /^\s*>/, // /^\s*<(?:(?:(\d+)|-)?>)?/,
-  word: /^[\s*&+<:,|]*(?<negated>[\s!-]*)[\s*&+<:,|]*(?:(?<quote>["'])(?<phrase>.*?)\k<quote>|(?<word>[^\s,|&+<:*()[\]!-]+))/,
+  word: /^[\s*&+<:,|]*(?<negated>[\s!-]*)[\s*&+<:,|]*(?:(?<quote>["'])(?<phrase>.*?)\k<quote>|(?<word>[^\s,|&+<>:*()[\]!-]+))/,
   quotedWordSep: /(?:[\s<()|&!]|:\*)+/, // those are mostly tsquery operator, not removing them would cause errors
   parStart: /^\s*[!-]*[([]/,
   parEnd: /^[)\]]/,
