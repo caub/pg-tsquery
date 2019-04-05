@@ -6,9 +6,9 @@
 
 ### Why?
 
-Using pg's `to_tsquery` directly with user input can throw errors. `plainto_tsquery` sanitizes the user input, but it's very limited (it just puts an and between words), similarly `websearch_to_tsquery` does this, except between quotes.
+Using pg's `to_tsquery` directly with user input can throw errors. `plainto_tsquery` sanitizes the user input, but it's very limited (it just puts an and between words), `websearch_to_tsquery` extends this behavior a little further only between double-quotes, with followedBy operator and negations.
 
-This module allows customizable text-search operators (and, or, followedBy, not, prefix, parentheses, quoted text), while also preserving quoted text just like `websearch_to_tsquery`.
+This module allows customizable text-search operators: and, or, followedBy, not, prefix, parentheses, quoted text (same behavior than `websearch_to_tsquery`).
 
 See the [full options](index.d.ts#L1-L12) and [defaults](index.js#L6-L17)
 
@@ -30,8 +30,6 @@ pool.query('SELECT * FROM tabby WHERE to_tsvector(col) @@ to_tsquery($1)', [tsqu
 
 
 ### [Demo](https://caub.github.io/pg-tsquery)
-
-Supports Nodejs>=10. For lower versions, you might need `if (!String.prototype.trimStart) String.prototype.trimStart = String.prototype.trim;`
 
 [npm-image]: https://img.shields.io/npm/v/pg-tsquery.svg?style=flat-square
 [npm-url]: https://www.npmjs.com/package/pg-tsquery
