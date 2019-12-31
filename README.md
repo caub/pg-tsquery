@@ -10,7 +10,7 @@ Using pg's `to_tsquery` directly with user input can throw errors. `plainto_tsqu
 
 This module allows customizable text-search operators: and, or, followedBy, not, prefix, parentheses, quoted text (same behavior than `websearch_to_tsquery`).
 
-See the [full options](index.d.ts#L1-L12) and [defaults](index.js#L6-L17)
+See the [options defaults values](index.js#L52-L61)
 
 ### Usage
 ```js
