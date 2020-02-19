@@ -12,12 +12,23 @@ This module allows customizable text-search operators: and, or, followedBy, not,
 
 See the [options defaults values](index.js#L52-L61)
 
-### Usage
+### usage
 ```js
 const tsquery = require('pg-tsquery')(/* options can be passed to override the defaults */);
 
-pool.query('SELECT * FROM tabby WHERE to_tsvector(col) @@ to_tsquery($1)', [tsquery(str)])
+pool.query('SELECT * FROM tabby WHERE to_tsvector(col) @@ to_tsquery($1)', [tsquery(str)]);
+
+// or get a reusable instance
+const {Tsquery} = require('pg-tsquery');
+
+const parser = new Tsquery(/* options can be passed to override the defaults */);
+
+// then one of those equivalent ways to process your input:
+parse.parseAndStringify(str);
+`${parser.parse(str) || ''}`;
 ```
+
+
 
 | inputs | output |
 | --- | --- |

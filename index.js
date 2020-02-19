@@ -72,6 +72,10 @@ class Tsquery {
     this.tailOp = tailOp;
   }
 
+  parseAndStringify(str) {
+    return `${this.parse(str) || ''}`;
+  }
+
   /**
    * Parse string as a Node tree, invoke .toString() to get back a string value for thta tree
    * @param {string} str
