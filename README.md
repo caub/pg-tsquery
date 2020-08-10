@@ -24,7 +24,7 @@ const {Tsquery} = require('pg-tsquery');
 const parser = new Tsquery(/* options can be passed to override the defaults */);
 
 // then one of those equivalent ways to process your input:
-parse.parseAndStringify(str);
+parser.parseAndStringify(str);
 `${parser.parse(str) || ''}`;
 ```
 
