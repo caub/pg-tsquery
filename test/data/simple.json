@@ -17,7 +17,7 @@
   ],
   [
     "  o(x)-o ",
-    "o&x&!o"
+    "o&x&-o"
   ],
   [
     "  !o(x)o ",
@@ -25,15 +25,15 @@
   ],
   [
     "  o(-x)o ",
-    "o&!x&o"
+    "o&-x&o"
   ],
   [
     "-(foo (bar,sib)) ok",
-    "!(foo&(bar|sib))&ok"
+    "-&foo&(bar|sib)&ok"
   ],
   [
     "-(fast|fox) ok",
-    "!(fast|fox)&ok"
+    "-&(fast|fox)&ok"
   ],
   [
     "(fast|fox) q",
@@ -53,7 +53,7 @@
   ],
   [
     " rgr   |, , ok,,ok+rg*rh*t&jnj&j&&jn\n\nrgr",
-    "rgr|ok|ok&rg:*&rh:*&t&jnj&j&jn&rgr"
+    "rgr|ok|ok+rg:*&rh:*&t&jnj&j&jn&rgr"
   ],
   [
     " ,,,,,, ",
@@ -61,11 +61,11 @@
   ],
   [
     " ,,,,+&&++ ",
-    ""
+    "+&++"
   ],
   [
     " ,,,,+|+\"+ &!& ",
-    "\""
+    "+|+\"+"
   ],
   [
     ":*,,, lol",
@@ -73,15 +73,15 @@
   ],
   [
     " foo,bar  ,`  lol !,ok, !! -blue ",
-    "foo|bar|`&lol&ok|!blue"
+    "foo|bar|`&lol&ok|!-blue"
   ],
   [
     " foo+---bar  ,  lol `+ok+ blue ",
-    "foo&!bar|lol&`&ok&blue"
+    "foo+---bar|lol&`+ok+&blue"
   ],
   [
     " foo& &&!bar - & | '\"\"' & lol +,ok+ blue \"\" ",
-    "foo&!bar&\"\"\"\"&lol&ok&blue&\"\""
+    "foo&!bar&-&\"\"&lol&+|ok+&blue&\"\""
   ],
   [
     "  (h(e((ll))o, (nas(ty)), (world\t\t",
@@ -97,7 +97,7 @@
   ],
   [
     "follo* | by , nothin* <2>  \n ",
-    "follo:*|by|nothin:*&2"
+    "follo:*|by|nothin:*&2>"
   ],
   [
     " (lol (foo(bar (ok, ok",
@@ -105,10 +105,14 @@
   ],
   [
     "Test \"quoted text G1-ABC +37544:*\" ",
-    "Test&\"quoted<->text<->G1-ABC<->+37544<->\""
+    "Test&\"quoted&text&G1-ABC&+37544:*&\""
   ],
   [
     " Please, contribute > to this proj* and repo* by add* mor* (ex*,example*)! Thanks",
-    "Please|contribute<->to&this&proj:*&repo:*&by&add:*&mor:*&(ex:*|example:*)&Thanks"
+    "Please|contribute<->to&this&proj:*&and&repo:*&by&add:*&mor:*&(ex:*|example:*)&Thanks"
+  ],
+  [
+    "'abs",
+    "abs"
   ]
 ]
