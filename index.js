@@ -9,7 +9,7 @@ const PRECEDENCES = {
 };
 
 class Node {
-  constructor({ type, input, negated, left, right, value, prefix }) {
+  constructor({ type, input, negated, left, right, value, prefix, quoted }) {
     this.type = type; // '&'|'|'|'<->'|'<1>'|'<2>'.. or undefined if a word node (leaf node)
     this.input = input; // remaining string to parse
     this.negated = negated; // boolean
@@ -17,28 +17,32 @@ class Node {
     this.right = right; // Node
     this.value = value; // word node string value
     this.prefix = prefix; // word node prefix when using a :* operator
+    this.quoted = quoted; // whether the node is wrapped in quotes (aka websearch_to_tsquery)
   }
 
   toString() {
-    const s = this.negated ? '!' : '';
-
     if (!this.type) {
-      return this.value && s + this.value + (this.prefix ? ':*' : ''); // avoid just '!'
+      if (!this.value) return ''; // avoid just ! (negated empty word, shouldn't happen with proper non-empty word regex tho)
+
+      const quotedValue = this.negated && this.quoted
+        ? `!(${this.value})`
+        : `${this.negated ? '!' : ''}${this.value}`
+      return quotedValue + (this.prefix ? ':*' : '');
     }
 
     let left = this.left;
     let right = this.right;
 
-    if (this.left.type && PRECEDENCES[this.type[0]] > PRECEDENCES[this.left.type[0]] && !this.left.negated) {
+    if (left.type && PRECEDENCES[this.type[0]] > PRECEDENCES[left.type[0]] && !left.negated) {
       // wrap left in parens
       left = `(${left})`;
     }
-    if (this.right.type && PRECEDENCES[this.type[0]] > PRECEDENCES[this.right.type[0]] && !this.right.negated) {
+    if (right.type && PRECEDENCES[this.type[0]] > PRECEDENCES[right.type[0]] && !right.negated) {
       // wrap right in parens
       right = `(${right})`;
     }
     const content = `${left}${this.type}${right}`;
-    return s ? `${s}(${content})` : content;
+    return this.negated ? `!(${content})` : content;
   }
 }
 
@@ -96,6 +100,7 @@ class Tsquery {
           right,
           value: undefined,
           prefix: undefined,
+          quoted: undefined,
         });
         tail = node.input;
       }
@@ -125,6 +130,7 @@ class Tsquery {
         right,
         value: undefined,
         prefix: undefined,
+        quoted: undefined,
       });
     }
     return node;
@@ -152,6 +158,7 @@ class Tsquery {
         right,
         value: undefined,
         prefix: undefined,
+        quoted: undefined,
       });
     }
     return node;
@@ -179,6 +186,7 @@ class Tsquery {
         right,
         value: undefined,
         prefix: undefined,
+        quoted: undefined,
       });
     }
     return node;
@@ -212,6 +220,7 @@ class Tsquery {
       ? m.groups.word.replace(/'/g, '') // replace single quotes, else you'd get a syntax error in pg's ts_query
       : `"${m.groups.phrase.split(this.quotedWordSep).join('<->')}"`; // it looks nasty, but to_tsquery will handle this well, see tests, in the end it behaves like websearch_to_tsquery
     const negated = !!m.groups.negated;
+
     return new Node({
       type: undefined,
       value,
@@ -220,6 +229,7 @@ class Tsquery {
       right: undefined,
       input,
       prefix,
+      quoted: !!m.groups.quote,
     });
   }
 }

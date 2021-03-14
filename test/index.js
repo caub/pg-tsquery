@@ -1,8 +1,9 @@
 const assert = require('assert');
 const { Tsquery } = require('../index');
 const pg = require('pg');
-const data = require('./data/default.json');
-const dataSimple = require('./data/simple.json');
+const data = require('./data-default.json');
+const dataSimple = require('./data-simple.json');
+const dataWebsearch = require('./data-websearch.json');
 
 const pool = new pg.Pool({ connectionString: 'pg://postgres@localhost:5432/postgres' });
 
@@ -38,11 +39,10 @@ async function test(tsquery, data) {
       assert(x);
     });
 
-  // todo add more tests of queries matching with it
-
-  for (const [s] of data) {
+  for (const [s, , expectedQuery] of data) {
     const tq = `${tsquery.parse(s) || ''}`;
-    await pool.query(`select to_tsquery($1)`, [tq]);
+    const { rows } = await pool.query(`select to_tsquery($1)`, [tq]);
+    if (expectedQuery) assert.strictEqual(rows[0].to_tsquery, expectedQuery);
   }
 
   // quick perf test
@@ -63,6 +63,9 @@ async function test(tsquery, data) {
 
 (async () => {
   try {
+    await test(tsquery, dataWebsearch);
+    console.log('websearch dataset OK');
+
     await test(tsquery, data);
     console.log('default dataset OK');
 
@@ -70,6 +73,8 @@ async function test(tsquery, data) {
     console.log('simple dataset OK');
   } catch (err) {
     console.error(err);
-    process.exit(1);
+    process.exitCode = 1;
+  } finally {
+    await pool.end();
   }
 })();

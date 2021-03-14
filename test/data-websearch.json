@@ -1,0 +1,7 @@
+[
+  [
+    "figs -\"yellow bananas\" or persimmons",
+    "figs&!(\"yellow<->bananas\")|persimmons",
+    "'fig' & !( 'yellow' <-> 'banana' ) | 'persimmon'"
+  ]
+]
