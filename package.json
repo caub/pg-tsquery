@@ -1,6 +1,6 @@
 {
   "name": "pg-tsquery",
-  "version": "8.1.0",
+  "version": "8.2.0",
   "description": "Parse user input into valid text search queries",
   "engines": {
     "node": ">=10"
