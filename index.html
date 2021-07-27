@@ -46,7 +46,7 @@ textarea {
 	<h1><a href="https://github.com/caub/pg-tsquery">pg-tsquery</a></h1>
 </header>
 <main>
-	<textarea id="input" placeholder="Write your input">Write any* you want like (this, that or -zulu)</textarea>
+	<textarea id="input" placeholder="Write your input">Write any* you want like (this, that or -zulu). It's cool no?</textarea>
 	<output id="output">...</output>
 </main>
 
@@ -55,7 +55,7 @@ textarea {
 	let text = await fetch('./index.js').then(r=>r.text());
 	text = text.replace('module.exports = ', 'export default ');
 	const {default: Tsquery} = await import(URL.createObjectURL(new Blob([text], {type: 'application/javascript'})));
-	const tsquery = Tsquery();
+	const tsquery = Tsquery({singleQuoteReplacement: '&'});
 	function update() {
 		output.innerText = tsquery(input.value);
 	}

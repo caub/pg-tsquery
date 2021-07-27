@@ -63,6 +63,8 @@ class Tsquery {
     negated = /[!-]$/,
     prefix = /^(\*|:\*)*/,
     tailOp = '&',
+    singleQuoteReplacement = '',
+
   } = {}) {
     this.or = or;
     this.and = and;
@@ -74,6 +76,7 @@ class Tsquery {
     this.negated = negated;
     this.prefix = prefix;
     this.tailOp = tailOp;
+    this.singleQuoteReplacement = singleQuoteReplacement;
   }
 
   parseAndStringify(str) {
@@ -217,7 +220,7 @@ class Tsquery {
     const prefix = this.prefix ? next.match(this.prefix)[0] : '';
     const input = next.slice(prefix.length);
     const value = m.groups.word
-      ? m.groups.word.replace(/'/g, '') // replace single quotes, else you'd get a syntax error in pg's ts_query
+      ? m.groups.word.replace(/'/g, this.singleQuoteReplacement) // replace single quotes, else you'd get a syntax error in pg's ts_query
       : `"${m.groups.phrase.split(this.quotedWordSep).join('<->')}"`; // it looks nasty, but to_tsquery will handle this well, see tests, in the end it behaves like websearch_to_tsquery
     const negated = !!m.groups.negated;
 

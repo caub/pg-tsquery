@@ -9,6 +9,7 @@ export interface TsqueryOptions {
     parEnd?: RegExp; // regex for  end of parenthesized group
     prefix?: RegExp; // regex for detecting `prefix` operator (placed at the end of a word to match words starting like it)
     tailOp?: string; // default operator to use with tail (unparsed suffix of the query, if any)
+    singleQuoteReplacement?: string;
 }
 
 export default function (options?: TsqueryOptions): (str: string) => string;
