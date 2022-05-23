@@ -5,7 +5,7 @@ const data = require('./data-default.json');
 const dataSimple = require('./data-simple.json');
 const dataWebsearch = require('./data-websearch.json');
 
-const pool = new pg.Pool({ connectionString: 'pg://postgres@localhost:5432/postgres' });
+const pool = new pg.Pool({ connectionString: 'pg://postgres:postgres@localhost:5432/postgres' });
 
 const tsquery = new Tsquery(); // use default config
 const tsquerySimple = new Tsquery({
