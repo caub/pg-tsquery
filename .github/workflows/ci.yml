@@ -1,0 +1,35 @@
+name: API-test
+
+on:
+  push:
+    # branches:
+    #   - dev
+    #   # - releases/*
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          # PGUSER: postgres
+          # PGDATABASE: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ci_pgtsquery_test
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+      - run: npm i
+      - run: npm test
+      - run: npx nyc report --reporter=lcov > coverage.lcov && npx codecov
