@@ -45,3 +45,7 @@ const parser = new Tsquery(/* options can be passed to override the defaults */)
 [travis-url]: https://travis-ci.org/caub/pg-tsquery
 [codecov-image]: https://img.shields.io/codecov/c/github/caub/pg-tsquery.svg?style=flat-square
 [codecov-url]: https://codecov.io/gh/caub/pg-tsquery
+
+### Support
+
+Please consider reporting issues and trying to create a pull request as well
