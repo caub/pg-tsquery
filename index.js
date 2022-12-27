@@ -24,10 +24,10 @@ class Node {
     if (!this.type) {
       if (!this.value) return ''; // avoid just ! (negated empty word, shouldn't happen with proper non-empty word regex tho)
 
-      const quotedValue = this.negated && this.quoted
-        ? `!(${this.value})`
-        : `${this.negated ? '!' : ''}${this.value}`
-      return quotedValue + (this.prefix ? ':*' : '');
+      const prefixed = `${this.value}${this.prefix ? ':*' : ''}`;
+      return this.negated && this.quoted
+        ? `!(${prefixed})`
+        : `${this.negated ? '!' : ''}${prefixed}`;
     }
 
     let left = this.left;
