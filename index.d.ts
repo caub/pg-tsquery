@@ -12,4 +12,53 @@ export interface TsqueryOptions {
     singleQuoteReplacement?: string; // should not be a reserved word like <()|&!]|:\*
 }
 
+interface BaseNode<T extends string | undefined> {
+    readonly type: T;
+    readonly negated: boolean | undefined;
+    readonly left: TsqueryNode | undefined;
+    readonly right: TsqueryNode | undefined;
+    readonly value: string | undefined;
+    readonly prefix: string | undefined;
+    readonly quoted: boolean | undefined;
+    toString(): string;
+}
+
+export interface AndNode extends BaseNode<"&"> {
+    readonly left: TsqueryNode;
+    readonly right: TsqueryNode;
+    readonly value: undefined;
+    readonly prefix: undefined;
+    readonly quoted: undefined;
+}
+export interface OrNode extends BaseNode<"|"> {
+    readonly left: TsqueryNode;
+    readonly right: TsqueryNode;
+    readonly value: undefined;
+    readonly prefix: undefined;
+    readonly quoted: undefined;
+}
+
+export interface FollowedByNode extends BaseNode<`<${"-" | number}>`> {
+    readonly left: WordNode;
+    readonly right: WordNode;
+    readonly value: undefined;
+    readonly prefix: undefined;
+    readonly quoted: undefined;
+}
+
+export interface WordNode extends BaseNode<undefined> {
+    readonly value: string;
+    readonly left: undefined;
+    readonly right: undefined;
+    readonly quoted: boolean;
+}
+
+export type TsqueryNode = AndNode | OrNode | FollowedByNode | WordNode;
+
+export class Tsquery {
+    constructor(options?: TsqueryOptions);
+    parseAndStringify(str: string): string;
+    parse(str: string): TsqueryNode | undefined;
+}
+
 export default function (options?: TsqueryOptions): (str: string) => string;
